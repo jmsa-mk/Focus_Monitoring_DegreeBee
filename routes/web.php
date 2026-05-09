@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-
 Route::get('/', function () {
     return Inertia::render('Home');
 })->name('home');
@@ -26,6 +25,11 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/explore', [VideoController::class, 'explore'])->name('explore');
 
+    Route::get('/uploadVideo', function () {
+        return Inertia::render('UploadVideo', [
+            'user' => Auth::user(),
+        ]);
+    })->name('uploadVideo');
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -37,6 +41,10 @@ Route::middleware('auth')->group(function () {
         ->name('changePassword');
     Route::post('/profile/change-password', [ProfileController::class, 'updatePassword'])
         ->name('changePassword.update');
+
+    Route::post('/videos/upload', [VideoController::class, 'store'])->name('videos.upload');
+    Route::get('/videos/{id}', [VideoController::class, 'show']);
+
 
 
 });
