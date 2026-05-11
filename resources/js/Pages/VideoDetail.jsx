@@ -487,7 +487,42 @@ export default function VideoDetail() {
         };
     }, [saveSession]);
 
-  
+    function submitRating(value) {
+        setRating(value);
+        router.post(`/videos/${video.id}/rate`, { rating: value }, { preserveScroll: true });
+    }
+
+    const totalTime = focusTime + unfocusTime;
+    const focusScore = totalTime > 0 ? Math.round((focusTime / totalTime) * 100) : 100;
+
+    const stateConfig = {
+        [STATE.FOCUSED]: {
+            color: "bg-green-500",
+            ring: "ring-green-400",
+            label: "Focused",
+            text: "text-green-700 dark:text-green-300",
+        },
+        [STATE.IDLE]: {
+            color: "bg-yellow-500",
+            ring: "ring-yellow-400",
+            label: "Idle",
+            text: "text-yellow-700 dark:text-yellow-300",
+        },
+        [STATE.DISTRACTED]: {
+            color: "bg-red-500",
+            ring: "ring-red-400",
+            label: "Distracted",
+            text: "text-red-700 dark:text-red-300",
+        },
+        [STATE.PAUSED]: {
+            color: "bg-[#01A9F2]",
+            ring: "ring-[#01A9F2]",
+            label: "Paused",
+            text: "text-[#01A9F2] dark:text-[#797CFF]",
+        },
+    };
+
+    const cfg = stateConfig[focusState];
 
     return (
         <>
@@ -501,7 +536,79 @@ export default function VideoDetail() {
                 <Navbar />
                 <Toaster position="top-right" />
 
+                <div className="fixed top-24 right-6 z-30">
+                    <div
+                        className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-4 w-64
+                            border border-gray-200 dark:border-gray-700"
+                    >
+                        <div className="flex items-center gap-3">
+                            <span className="relative flex h-3 w-3">
+                                {focusState === STATE.FOCUSED && (
+                                    <span
+                                        className={`absolute inline-flex h-full w-full rounded-full ${cfg.color} opacity-75 animate-ping`}
+                                    />
+                                )}
+                                <span className={`relative inline-flex rounded-full h-3 w-3 ${cfg.color}`} />
+                            </span>
+                            <span className={`text-sm font-semibold ${cfg.text} inline-flex items-center gap-1.5`}>
+                                {focusState === STATE.PAUSED && <i className="fa-solid fa-pause text-xs"></i>}
+                                {cfg.label}
+                            </span>
+                            <span className="ml-auto text-xs text-gray-400 dark:text-gray-500">
+                                {focusScore}%
+                            </span>
+                        </div>
 
+                        {focusState === STATE.PAUSED && (
+                            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 italic">
+                                Tracking paused — video tidak diputar
+                            </p>
+                        )}
+
+                        <div className="mt-3 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                            <div
+                                className="h-full bg-linear-to-r from-[#00E2E0] to-[#797CFF] transition-all"
+                                style={{ width: `${focusScore}%` }}
+                            />
+                        </div>
+
+                        <div className="mt-3 flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                            <div>
+                                <div className="font-semibold text-gray-900 dark:text-white">
+                                    {formatTime(focusTime)}
+                                </div>
+                                <div>Focused</div>
+                            </div>
+                            <div>
+                                <div className="font-semibold text-gray-900 dark:text-white">
+                                    {formatTime(unfocusTime)}
+                                </div>
+                                <div>Distracted</div>
+                            </div>
+                            <div>
+                                <div className="font-semibold text-gray-900 dark:text-white">
+                                    {formatTime(totalTime)}
+                                </div>
+                                <div>Total</div>
+                            </div>
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={openSummary}
+                            disabled={totalTime < 5}
+                            className="mt-4 w-full py-2 rounded-lg text-sm font-semibold
+                                bg-linear-to-r from-[#00E2E0] to-[#797CFF]
+                                dark:from-[#213A58] dark:to-[#172D9D]
+                                text-white shadow hover:opacity-90 transition
+                                disabled:opacity-40 disabled:cursor-not-allowed
+                                inline-flex items-center justify-center gap-2"
+                        >
+                            <i className="fa-solid fa-flag-checkered"></i>
+                            End Session
+                        </button>
+                    </div>
+                </div>
 
 
 
@@ -632,10 +739,202 @@ export default function VideoDetail() {
                     </div>
                 </div>
 
+                {showOverlay && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+                        <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl p-10 max-w-md mx-4 text-center
+                            border-2 border-red-400">
+                            <div className="text-6xl mb-4 text-red-500">
+                                <i className="fa-solid fa-triangle-exclamation"></i>
+                            </div>
+                            <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">
+                                Apakah kamu masih belajar?
+                            </h2>
+                            <p className="text-gray-600 dark:text-gray-300 mb-2">
+                                Kamu sudah tidak fokus selama lebih dari 1 menit.
+                            </p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                                Saat ini fokus kamu: <strong>{focusScore}%</strong>
+                            </p>
+                            <button
+                                onClick={() => {
+                                    setShowOverlay(false);
+                                    setFocusState(STATE.FOCUSED);
+                                    lastActivityRef.current = Date.now();
+                                }}
+                                className="w-full py-3 rounded-xl text-white font-semibold
+                                    bg-linear-to-r from-[#00E2E0] to-[#797CFF]
+                                    dark:from-[#213A58] dark:to-[#172D9D]
+                                    hover:opacity-90 transition shadow-md"
+                            >
+                                Saya kembali, lanjut belajar
+                            </button>
+                        </div>
+                    </div>
+                )}
 
 
+                {showSummary && summaryData && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                        <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl
+                            w-full max-w-md max-h-[90vh] overflow-y-auto
+                            border border-gray-200 dark:border-gray-700">
 
-                
+
+                            <div className="bg-linear-to-r from-[#00E2E0] to-[#797CFF]
+                                dark:from-[#213A58] dark:to-[#172D9D]
+                                p-6 text-white text-center rounded-t-3xl">
+                                <div className="text-4xl mb-2">
+                                    <i className="fa-solid fa-flag-checkered"></i>
+                                </div>
+                                <h2 className="text-2xl font-bold">Sesi Belajar Selesai</h2>
+                                <p className="text-sm opacity-90 mt-1">
+                                    Ini ringkasan sesi kamu
+                                </p>
+                            </div>
+
+
+                            <div className="p-6 space-y-5">
+
+                                <div className="flex flex-col items-center">
+                                    <div className={`text-6xl font-bold ${
+                                        summaryData.score >= 80
+                                            ? "text-emerald-500"
+                                            : summaryData.score >= 60
+                                            ? "text-[#01A9F2]"
+                                            : summaryData.score >= 40
+                                            ? "text-yellow-500"
+                                            : "text-red-500"
+                                    }`}>
+                                        {Math.round(summaryData.score)}%
+                                    </div>
+                                    <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                        Focus Score
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-3 gap-3 text-center">
+                                    <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
+                                        <div className="text-xs text-gray-500 dark:text-gray-400">Focused</div>
+                                        <div className="font-bold text-gray-900 dark:text-white mt-1">
+                                            {formatTime(summaryData.focus)}
+                                        </div>
+                                    </div>
+                                    <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
+                                        <div className="text-xs text-gray-500 dark:text-gray-400">Distracted</div>
+                                        <div className="font-bold text-gray-900 dark:text-white mt-1">
+                                            {formatTime(summaryData.unfocus)}
+                                        </div>
+                                    </div>
+                                    <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
+                                        <div className="text-xs text-gray-500 dark:text-gray-400">Total</div>
+                                        <div className="font-bold text-gray-900 dark:text-white mt-1">
+                                            {formatTime(summaryData.total)}
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                {summaryData.leveledUp && (
+                                    <div className="rounded-2xl border-2 border-[#797CFF] dark:border-[#172D9D]
+                                        p-4 bg-[#BAFFFE]/40 dark:bg-[#172D9D]/30">
+                                        <div className="text-xs uppercase tracking-wide text-[#172D9D] dark:text-[#797CFF] font-bold mb-2 inline-flex items-center gap-2">
+                                            <i className="fa-solid fa-arrow-up"></i>
+                                            Level Up!
+                                        </div>
+                                        <div className="flex items-center gap-3 text-sm">
+                                            <span className="text-gray-500 dark:text-gray-400">
+                                                <i className={summaryData.leveledUp.from.icon + " mr-1"}></i>
+                                                {summaryData.leveledUp.from.name}
+                                            </span>
+                                            <i className="fa-solid fa-arrow-right text-gray-400"></i>
+                                            <span className="font-bold" style={{ color: summaryData.leveledUp.to.color }}>
+                                                <i className={summaryData.leveledUp.to.icon + " mr-1"}></i>
+                                                {summaryData.leveledUp.to.name}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {summaryData.newAchievements.length > 0 && (
+                                    <div>
+                                        <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 font-bold mb-2 inline-flex items-center gap-2">
+                                            <i className="fa-solid fa-trophy text-yellow-500"></i>
+                                            New Achievements
+                                        </div>
+                                        <div className="space-y-2">
+                                            {summaryData.newAchievements.map((a) => (
+                                                <div
+                                                    key={a.name}
+                                                    className="flex items-center gap-3 p-3 rounded-xl
+                                                        border-2 border-[#01A9F2] bg-[#BAFFFE]/30 dark:bg-[#172D9D]/30 dark:border-[#797CFF]"
+                                                >
+                                                    <div className="text-2xl text-[#01A9F2] dark:text-[#797CFF]">
+                                                        <i className={a.icon}></i>
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <div className="font-semibold text-sm text-gray-900 dark:text-white">
+                                                            {a.name}
+                                                        </div>
+                                                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                                                            {a.desc}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="text-center text-sm text-gray-600 dark:text-gray-300 italic">
+                                    {summaryData.score >= 90 && "Luar biasa! Konsentrasimu hampir sempurna."}
+                                    {summaryData.score >= 75 && summaryData.score < 90 && "Bagus! Pertahankan fokus seperti ini."}
+                                    {summaryData.score >= 60 && summaryData.score < 75 && "Cukup baik. Coba kurangi distraksi lain kali."}
+                                    {summaryData.score >= 40 && summaryData.score < 60 && "Banyak distraksi. Coba environment lebih tenang."}
+                                    {summaryData.score < 40 && "Mungkin saat ini bukan waktu terbaik untuk belajar?"}
+                                </div>
+                            </div>
+
+
+                            <div className="p-6 pt-0 flex gap-3">
+                                <button
+                                    type="button"
+                                    onClick={handleDiscard}
+                                    disabled={savingSession}
+                                    className="flex-1 py-3 rounded-xl border border-gray-300 dark:border-gray-600
+                                        text-gray-700 dark:text-gray-200
+                                        hover:bg-gray-100 dark:hover:bg-gray-800
+                                        font-semibold transition disabled:opacity-50
+                                        inline-flex items-center justify-center gap-2"
+                                >
+                                    <i className="fa-solid fa-trash"></i>
+                                    Discard
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleSaveAndContinue}
+                                    disabled={savingSession}
+                                    className="flex-1 py-3 rounded-xl text-white font-semibold
+                                        bg-linear-to-r from-[#00E2E0] to-[#797CFF]
+                                        dark:from-[#213A58] dark:to-[#172D9D]
+                                        hover:opacity-90 transition shadow-md disabled:opacity-50
+                                        inline-flex items-center justify-center gap-2"
+                                >
+                                    {savingSession ? (
+                                        <>
+                                            <i className="fa-solid fa-spinner fa-spin"></i>
+                                            Saving...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <i className="fa-solid fa-floppy-disk"></i>
+                                            Save & Continue
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </>
     );

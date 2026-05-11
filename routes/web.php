@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\FocusLogController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VideoController;
 use Illuminate\Support\Facades\Auth;
@@ -20,6 +21,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/premium', function () {
     return Inertia::render('Subscription');
 });
+
 
 Route::middleware('auth')->group(function () {
 
@@ -43,9 +45,25 @@ Route::middleware('auth')->group(function () {
         ->name('changePassword.update');
 
     Route::post('/videos/upload', [VideoController::class, 'store'])->name('videos.upload');
+    Route::post('/videos/{id}/rate', [VideoController::class, 'rate']);
     Route::get('/videos/{id}', [VideoController::class, 'show']);
 
+    Route::get('/edit-video/{id}', function ($id) {
+        $video = \App\Models\Video::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        return Inertia::render('EditVideo', [
+            'video' => $video,
+        ]);
+    });
+
+    Route::get('/manageVideos', [VideoController::class, 'manage']);
+    Route::put('/videos/{id}', [VideoController::class, 'update']);
+    Route::delete('/videos/{id}', [VideoController::class, 'destroy']);
 
 
+    Route::post('/focus-session', [FocusLogController::class, 'store']);
 });
+
 
