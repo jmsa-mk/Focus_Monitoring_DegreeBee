@@ -1,12 +1,14 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\FocusLogController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VideoController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
 
 Route::get('/', function () {
     return Inertia::render('Home');
@@ -21,7 +23,6 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/premium', function () {
     return Inertia::render('Subscription');
 });
-
 
 Route::middleware('auth')->group(function () {
 
@@ -62,8 +63,10 @@ Route::middleware('auth')->group(function () {
     Route::put('/videos/{id}', [VideoController::class, 'update']);
     Route::delete('/videos/{id}', [VideoController::class, 'destroy']);
 
+    Route::get('/bookmark', [BookmarkController::class, 'index']);
+    Route::post('/bookmark/{video}', [BookmarkController::class, 'toggle']);
+
 
     Route::post('/focus-session', [FocusLogController::class, 'store']);
 });
-
 
