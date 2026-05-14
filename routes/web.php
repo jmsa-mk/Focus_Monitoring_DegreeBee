@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookmarkController;
+use App\Http\Controllers\ClassesController;
 use App\Http\Controllers\FocusLogController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VideoController;
@@ -66,6 +67,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/bookmark', [BookmarkController::class, 'index']);
     Route::post('/bookmark/{video}', [BookmarkController::class, 'toggle']);
 
+    Route::get('/classes', [ClassesController::class, 'index'])->name('classes.index');
+    Route::get('/classes/create', [ClassesController::class, 'create'])->name('classes.create');
+    Route::get('/join', [ClassesController::class, 'showJoin']);
+    Route::post('/classes/store', [ClassesController::class, 'storeClass']);
+    Route::post('/classes/join', [ClassesController::class, 'join']);
+    Route::get('/classes/{class}', [ClassesController::class, 'show'])->name('classes.show');
+    Route::delete('/classes/{class}', [ClassesController::class, 'destroy']);
 
     Route::post('/focus-session', [FocusLogController::class, 'store']);
 });
