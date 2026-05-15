@@ -3,6 +3,8 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\ClassesController;
+use App\Http\Controllers\ClassVideoController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FocusLogController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VideoController;
@@ -24,6 +26,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/premium', function () {
     return Inertia::render('Subscription');
 });
+
 
 Route::middleware('auth')->group(function () {
 
@@ -64,6 +67,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/videos/{id}', [VideoController::class, 'update']);
     Route::delete('/videos/{id}', [VideoController::class, 'destroy']);
 
+
     Route::get('/bookmark', [BookmarkController::class, 'index']);
     Route::post('/bookmark/{video}', [BookmarkController::class, 'toggle']);
 
@@ -73,8 +77,18 @@ Route::middleware('auth')->group(function () {
     Route::post('/classes/store', [ClassesController::class, 'storeClass']);
     Route::post('/classes/join', [ClassesController::class, 'join']);
     Route::get('/classes/{class}', [ClassesController::class, 'show'])->name('classes.show');
-    Route::delete('/classes/{class}', [ClassesController::class, 'destroy']);
 
     Route::post('/focus-session', [FocusLogController::class, 'store']);
+
+    Route::post('/videos/{video}/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+    Route::post('/comments/{comment}/like', [CommentController::class, 'toggleLike'])->name('comments.like');
 });
 
+Route::prefix('classes/{classId}')->middleware('auth')->group(function () {
+    Route::get('/resources', [ClassVideoController::class, 'index']);
+    Route::post('/videos', [ClassVideoController::class, 'store']);
+    Route::put('/videos/{id}', [ClassVideoController::class, 'update']);
+    Route::delete('/videos/{id}', [ClassVideoController::class, 'destroy']);
+});

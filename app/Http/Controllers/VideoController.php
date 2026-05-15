@@ -48,7 +48,22 @@ class VideoController extends Controller
             ->where('user_id', $userId)
             ->value('rating');
 
-        // Cumulative stats for End Session summary preview (achievement diff)
+        $replyLoader = function ($q) use ($userId) {
+            $q->with('user')
+                ->withCount('likes')
+                ->withExists(['likes as is_liked' => fn ($lq) => $lq->where('user_id', $userId)])
+                ->oldest();
+        };
+
+        $comments = \App\Models\Comment::where('video_id', $video->id)
+            ->whereNull('parent_id')
+            ->with('user')
+            ->with(['replies' => $replyLoader])
+            ->withCount('likes')
+            ->withExists(['likes as is_liked' => fn ($q) => $q->where('user_id', $userId)])
+            ->latest()
+            ->get();
+
         $userStats = [
             'total_focus_seconds' => (int) \App\Models\FocusLog::where('user_id', $userId)->sum('focus_time'),
             'session_count' => \App\Models\FocusLog::where('user_id', $userId)->count(),
@@ -61,6 +76,7 @@ class VideoController extends Controller
             'video' => $video,
             'userRating' => $userRating,
             'userStats' => $userStats,
+            'comments' => $comments,
         ]);
     }
 

@@ -1,6 +1,7 @@
 import { Head, usePage, router } from "@inertiajs/react";
 import Navbar from "../Component/Navbar";
 import StarRating from "../Component/StarRating";
+import CommentSection from "../Component/CommentSection";
 import { useEffect, useRef, useState, useCallback } from "react";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -129,7 +130,6 @@ function beep(duration = 200, frequency = 440) {
         osc.start();
         osc.stop(ctx.currentTime + duration / 1000);
     } catch (e) {
-        // ignore
     }
 }
 
@@ -152,7 +152,7 @@ function getYoutubeId(link) {
 }
 
 export default function VideoDetail() {
-    const { video, userRating, userStats } = usePage().props;
+    const { video, userRating, userStats, comments, auth } = usePage().props;
 
     const [focusState, setFocusState] = useState(STATE.FOCUSED);
     const [focusTime, setFocusTime] = useState(0);
@@ -238,7 +238,6 @@ export default function VideoDetail() {
             player = new YT.Player("yt-player", {
                 events: {
                     onReady: () => {
-
                     },
                     onStateChange: (event) => {
                         const s = event.data;
@@ -271,7 +270,7 @@ export default function VideoDetail() {
                 try {
                     playerRef.current.destroy();
                 } catch (e) {
-
+                    // ignore
                 }
                 playerRef.current = null;
             }
@@ -304,7 +303,7 @@ export default function VideoDetail() {
                 setUnfocusTime((t) => t + 1);
             }
 
-
+            // Trigger tiered warnings
             const elapsedInState = Math.floor((now - stateStartRef.current) / 1000);
 
             if (current === STATE.DISTRACTED) {
@@ -410,7 +409,6 @@ export default function VideoDetail() {
             return null;
         }
     }, [video.id]);
-
 
     const openSummary = useCallback(() => {
         const f = focusTimeRef.current;
@@ -610,8 +608,6 @@ export default function VideoDetail() {
                     </div>
                 </div>
 
-
-
                 <div
                     className="max-w-7xl mx-auto p-8 bg-white dark:bg-gray-900 mt-8 rounded-2xl shadow relative
                         border border-gray-200 dark:border-gray-700"
@@ -737,6 +733,12 @@ export default function VideoDetail() {
                             </button>
                         </div>
                     </div>
+
+                    <CommentSection
+                        comments={comments || []}
+                        videoId={video.id}
+                        currentUserId={auth?.user?.id}
+                    />
                 </div>
 
                 {showOverlay && (
@@ -772,13 +774,11 @@ export default function VideoDetail() {
                     </div>
                 )}
 
-
                 {showSummary && summaryData && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
                         <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl
                             w-full max-w-md max-h-[90vh] overflow-y-auto
                             border border-gray-200 dark:border-gray-700">
-
 
                             <div className="bg-linear-to-r from-[#00E2E0] to-[#797CFF]
                                 dark:from-[#213A58] dark:to-[#172D9D]
@@ -791,7 +791,6 @@ export default function VideoDetail() {
                                     Ini ringkasan sesi kamu
                                 </p>
                             </div>
-
 
                             <div className="p-6 space-y-5">
 
@@ -832,7 +831,6 @@ export default function VideoDetail() {
                                         </div>
                                     </div>
                                 </div>
-
 
                                 {summaryData.leveledUp && (
                                     <div className="rounded-2xl border-2 border-[#797CFF] dark:border-[#172D9D]
@@ -893,7 +891,6 @@ export default function VideoDetail() {
                                     {summaryData.score < 40 && "Mungkin saat ini bukan waktu terbaik untuk belajar?"}
                                 </div>
                             </div>
-
 
                             <div className="p-6 pt-0 flex gap-3">
                                 <button
