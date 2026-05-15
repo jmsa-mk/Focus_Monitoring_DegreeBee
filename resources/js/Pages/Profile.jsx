@@ -88,12 +88,10 @@ export default function Profile() {
                 <section className="w-full flex justify-center px-6 py-10">
                     <div className="w-full max-w-7xl space-y-8">
 
-                        {/* ============== HERO CARD ============== */}
                         <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl p-8 md:p-12
                             dark:bg-gray-900/70 border border-white/40 dark:border-gray-700">
 
                             <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-                                {/* Avatar */}
                                 <div className="relative">
                                     {user.avatar_url ? (
                                         <img
@@ -107,7 +105,6 @@ export default function Profile() {
                                         </div>
                                     )}
 
-                                    {/* Level badge */}
                                     <div
                                         className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full
                                             text-white text-xs font-semibold shadow-md whitespace-nowrap
@@ -119,7 +116,6 @@ export default function Profile() {
                                     </div>
                                 </div>
 
-                                {/* Info */}
                                 <div className="flex-1 text-center md:text-left">
                                     <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
                                         {user.name || "Unnamed"}
@@ -179,7 +175,6 @@ export default function Profile() {
                             </div>
                         </div>
 
-                        {/* ============== FOCUS SUMMARY ============== */}
                         <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl p-8
                             dark:bg-gray-900/70 border border-white/40 dark:border-gray-700">
 
@@ -216,7 +211,6 @@ export default function Profile() {
                                 />
                             </div>
 
-                            {/* Focus vs Distracted bar */}
                             {focus.total_seconds > 0 && (
                                 <div className="mt-6">
                                     <div className="flex justify-between text-sm mb-2">
@@ -251,7 +245,6 @@ export default function Profile() {
                             )}
                         </div>
 
-                        {/* ============== WEEKLY CHART ============== */}
                         <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl p-8
                             dark:bg-gray-900/70 border border-white/40 dark:border-gray-700">
 
@@ -298,7 +291,6 @@ export default function Profile() {
                             </div>
                         </div>
 
-                        {/* ============== ACTIVITY STATS GRID ============== */}
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                             <ActivityCard label="Videos Watched" value={stats.videos_watched} icon="fa-regular fa-eye" />
                             <ActivityCard label="Videos Uploaded" value={stats.videos_uploaded} icon="fa-solid fa-video" />
@@ -309,7 +301,7 @@ export default function Profile() {
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-                            {/* ============== RECENT SESSIONS (paginated) ============== */}
+
                             <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl p-8
                                 dark:bg-gray-900/70 border border-white/40 dark:border-gray-700">
 
@@ -409,7 +401,6 @@ export default function Profile() {
                                 )}
                             </div>
 
-                            {/* ============== ACHIEVEMENTS ============== */}
                             <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl p-8
                                 dark:bg-gray-900/70 border border-white/40 dark:border-gray-700">
 
@@ -446,7 +437,6 @@ export default function Profile() {
                             </div>
                         </div>
 
-                        {/* ============== BEST SESSION ============== */}
                         {focus.best_session && (
                             <div className="bg-linear-to-r from-[#00E2E0] to-[#797CFF]
                                 dark:from-[#213A58] dark:to-[#172D9D]
