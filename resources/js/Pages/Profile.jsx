@@ -301,7 +301,6 @@ export default function Profile() {
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-
                             <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl p-8
                                 dark:bg-gray-900/70 border border-white/40 dark:border-gray-700">
 

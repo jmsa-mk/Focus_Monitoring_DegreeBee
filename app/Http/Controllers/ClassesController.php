@@ -97,10 +97,30 @@ class ClassesController extends Controller
             abort(403, 'This class is private.');
         }
 
+        $forumPosts = [];
+        if ($isCreator || $isEnrolled) {
+            $replyLoader = function ($q) use ($userId) {
+                $q->with('user')
+                    ->withCount('insights')
+                    ->withExists(['insights as has_insight' => fn ($iq) => $iq->where('user_id', $userId)])
+                    ->oldest();
+            };
+
+            $forumPosts = \App\Models\ForumPost::where('class_id', $class->id)
+                ->whereNull('parent_id')
+                ->with('user')
+                ->with(['replies' => $replyLoader])
+                ->withCount('insights')
+                ->withExists(['insights as has_insight' => fn ($q) => $q->where('user_id', $userId)])
+                ->latest()
+                ->get();
+        }
+
         return Inertia::render('ClassDetail', [
             'class' => $class,
             'isCreator' => $isCreator,
             'isEnrolled' => $isEnrolled,
+            'forumPosts' => $forumPosts,
         ]);
     }
 
@@ -167,13 +187,11 @@ class ClassesController extends Controller
         $currentThumbnail = $class->getRawOriginal('thumbnail');
 
         if ($request->hasFile('thumbnail')) {
-            // Replace existing thumbnail
             if ($currentThumbnail && !str_starts_with($currentThumbnail, 'http')) {
                 Storage::disk('public')->delete($currentThumbnail);
             }
             $payload['thumbnail'] = $request->file('thumbnail')->store('class-thumbnails', 'public');
         } elseif ($request->boolean('remove_thumbnail')) {
-            // Explicitly remove thumbnail
             if ($currentThumbnail && !str_starts_with($currentThumbnail, 'http')) {
                 Storage::disk('public')->delete($currentThumbnail);
             }

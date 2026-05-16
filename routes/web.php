@@ -4,7 +4,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\ClassesController;
 use App\Http\Controllers\ClassVideoController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\EnrollmentsController;
+use App\Http\Controllers\ForumPostController;
 use App\Http\Controllers\FocusLogController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VideoController;
@@ -12,7 +14,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// -----------------------------  Public Routes --------------------------------------
 
 Route::get('/', function () {
     return Inertia::render('Home');
@@ -28,7 +29,6 @@ Route::get('/premium', function () {
     return Inertia::render('Subscription');
 });
 
-// -----------------------Protected Routes (Auth Required)---------------------------------
 
 Route::middleware('auth')->group(function () {
 
@@ -42,7 +42,6 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Profile
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
     Route::get('/editProfile', [ProfileController::class, 'edit'])->name('editProfile');
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profileUpdate');
@@ -52,7 +51,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/change-password', [ProfileController::class, 'updatePassword'])
         ->name('changePassword.update');
 
-    // Videos
     Route::post('/videos/upload', [VideoController::class, 'store'])->name('videos.upload');
     Route::post('/videos/{id}/rate', [VideoController::class, 'rate']);
     Route::get('/videos/{id}', [VideoController::class, 'show']);
@@ -71,11 +69,9 @@ Route::middleware('auth')->group(function () {
     Route::put('/videos/{id}', [VideoController::class, 'update']);
     Route::delete('/videos/{id}', [VideoController::class, 'destroy']);
 
-    // Bookmarks
     Route::get('/bookmark', [BookmarkController::class, 'index']);
     Route::post('/bookmark/{video}', [BookmarkController::class, 'toggle']);
 
-    // Classes
     Route::get('/classes', [ClassesController::class, 'index'])->name('classes.index');
     Route::get('/classes/create', [ClassesController::class, 'create'])->name('classes.create');
     Route::get('/join', [ClassesController::class, 'showJoin']);
@@ -89,6 +85,11 @@ Route::middleware('auth')->group(function () {
         ->name('classes.unenroll');
 
     Route::post('/focus-session', [FocusLogController::class, 'store']);
+
+    Route::post('/videos/{video}/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+    Route::post('/comments/{comment}/like', [CommentController::class, 'toggleLike'])->name('comments.like');
 });
 
 Route::prefix('classes/{classId}')->middleware('auth')->group(function () {
@@ -96,4 +97,12 @@ Route::prefix('classes/{classId}')->middleware('auth')->group(function () {
     Route::post('/videos', [ClassVideoController::class, 'store']);
     Route::put('/videos/{id}', [ClassVideoController::class, 'update']);
     Route::delete('/videos/{id}', [ClassVideoController::class, 'destroy']);
+
+    Route::post('/forum', [ForumPostController::class, 'store'])->name('forum.store');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::put('/forum/{post}', [ForumPostController::class, 'update'])->name('forum.update');
+    Route::delete('/forum/{post}', [ForumPostController::class, 'destroy'])->name('forum.destroy');
+    Route::post('/forum/{post}/insight', [ForumPostController::class, 'toggleInsight'])->name('forum.insight');
 });

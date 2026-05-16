@@ -48,6 +48,7 @@ class VideoController extends Controller
             ->where('user_id', $userId)
             ->value('rating');
 
+        // Top-level comments with replies, like counts, and is_liked status
         $replyLoader = function ($q) use ($userId) {
             $q->with('user')
                 ->withCount('likes')
@@ -64,6 +65,7 @@ class VideoController extends Controller
             ->latest()
             ->get();
 
+        // Cumulative stats for End Session summary preview (achievement diff)
         $userStats = [
             'total_focus_seconds' => (int) \App\Models\FocusLog::where('user_id', $userId)->sum('focus_time'),
             'session_count' => \App\Models\FocusLog::where('user_id', $userId)->count(),

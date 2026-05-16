@@ -42,14 +42,12 @@ class ProfileController extends Controller
             ->orderByDesc('focus_time')
             ->first();
 
-        // Paginated sessions (5 per page, 'session_page' query param)
         $recentSessions = FocusLog::where('user_id', $user->id)
             ->with('video:id,title,topic,youtube_link')
             ->latest()
             ->paginate(5, ['*'], 'session_page')
             ->withQueryString();
 
-        // Daily stats — last 7 days (fill empty days with zeros)
         $rawDaily = FocusLog::where('user_id', $user->id)
             ->where('created_at', '>=', now()->subDays(6)->startOfDay())
             ->selectRaw('DATE(created_at) as date, AVG(focus_score) as avg_score, SUM(focus_time) as total_focus, COUNT(*) as sessions')
@@ -70,7 +68,6 @@ class ProfileController extends Controller
             ]);
         }
 
-        // Top topic
         $topTopic = DB::table('focus_logs')
             ->join('videos', 'videos.id', '=', 'focus_logs.video_id')
             ->where('focus_logs.user_id', $user->id)
@@ -80,7 +77,6 @@ class ProfileController extends Controller
             ->orderByDesc('total')
             ->first();
 
-        // Activity counts
         $stats = [
             'videos_uploaded' => Video::where('user_id', $user->id)->count(),
             'videos_watched' => FocusLog::where('user_id', $user->id)->distinct()->count('video_id'),
@@ -89,7 +85,6 @@ class ProfileController extends Controller
             'classes_joined' => enrollments::where('user_id', $user->id)->count(),
         ];
 
-        // Focus level (gamification, based on total focused hours)
         $hours = $totalFocus / 3600;
         $level = match (true) {
             $hours >= 50 => ['name' => 'Platinum Bee', 'icon' => 'fa-solid fa-crown', 'color' => '#172D9D'],
@@ -98,7 +93,6 @@ class ProfileController extends Controller
             default => ['name' => 'Bronze Bee', 'icon' => 'fa-solid fa-medal', 'color' => '#00E2E0'],
         };
 
-        // Achievements
         $achievements = [
             [
                 'name' => 'First Session',
