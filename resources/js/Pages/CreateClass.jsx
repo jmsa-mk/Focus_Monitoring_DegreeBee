@@ -75,7 +75,6 @@ export default function CreateClass() {
                         p-10 md:p-16 flex flex-col md:flex-row items-start gap-12
                         dark:bg-gray-900/70">
 
-                        {/* LEFT */}
                         <div className="flex-1 w-full">
                             <h1 className="text-4xl font-bold mb-6 text-gray-900 dark:text-white">
                                 Create New Class
@@ -86,7 +85,6 @@ export default function CreateClass() {
                                 whether it's public for everyone or private for selected students.
                             </p>
 
-                            {/* THUMBNAIL UPLOAD */}
                             <div className="mt-8">
                                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
                                     Thumbnail (optional)
@@ -160,7 +158,6 @@ export default function CreateClass() {
                             </div>
                         </div>
 
-                        {/* RIGHT — FORM */}
                         <form
                             onSubmit={handleSubmit}
                             className="flex-1 w-full max-w-md"

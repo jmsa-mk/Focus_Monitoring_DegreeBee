@@ -129,7 +129,6 @@ export default function EditProfile() {
                             />
                         </div>
 
-                        {/* RIGHT — FORM */}
                         <form
                             onSubmit={handleSubmit}
                             className="flex-1 w-full max-w-md"

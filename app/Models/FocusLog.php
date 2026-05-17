@@ -16,6 +16,7 @@ class FocusLog extends Model
         'total_time',
         'focus_time',
         'unfocus_time',
+        'cv_distract_time',
         'focus_score'
     ];
     

@@ -126,8 +126,8 @@ export default function UploadVideo(){
                 {showFlash && (
                     <div className="fixed bottom-6 right-6 z-50 animate-fade-in">
                         <div className="bg-white/80 dark:bg-gray-800/90 backdrop-blur-md border border-white/40 dark:border-gray-700 shadow-xl rounded-2xl px-6 py-4 flex items-center gap-3">
-                            <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold">
-                                ✓
+                            <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center">
+                                <i className="fa-solid fa-check"></i>
                             </div>
                             <p className="font-semibold text-gray-700 dark:text-white">
                                 {flash.success}

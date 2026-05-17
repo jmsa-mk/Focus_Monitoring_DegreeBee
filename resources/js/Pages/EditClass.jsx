@@ -80,7 +80,6 @@ export default function EditClass() {
                         p-10 md:p-16 flex flex-col md:flex-row items-start gap-12
                         dark:bg-gray-900/70">
 
-                        {/* LEFT */}
                         <div className="flex-1 w-full">
                             <h1 className="text-4xl font-bold mb-6 text-gray-900 dark:text-white">
                                 Edit Class
@@ -91,7 +90,6 @@ export default function EditClass() {
                                 who has access.
                             </p>
 
-                            {/* THUMBNAIL */}
                             <div className="mt-8">
                                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
                                     Thumbnail
@@ -171,7 +169,6 @@ export default function EditClass() {
                             </div>
                         </div>
 
-                        {/* RIGHT — FORM */}
                         <form
                             onSubmit={handleSubmit}
                             className="flex-1 w-full max-w-md"

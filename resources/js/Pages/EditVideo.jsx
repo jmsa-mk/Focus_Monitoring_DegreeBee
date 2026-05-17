@@ -55,7 +55,6 @@ export default function EditVideo() {
                         p-10 md:p-16 flex flex-col md:flex-row items-center gap-12
                         dark:bg-gray-900/70">
 
-                        {/* LEFT — THUMBNAIL */}
                         <div className="flex-1 flex flex-col items-center gap-6">
                             {thumbnail ? (
                                 <img
@@ -70,7 +69,6 @@ export default function EditVideo() {
                             )}
                         </div>
 
-                        {/* RIGHT — FORM */}
                         <form
                             onSubmit={submit}
                             className="flex-1 w-full max-w-md"

@@ -30,10 +30,10 @@ class ProfileController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        // Focus aggregates
         $base = FocusLog::where('user_id', $user->id);
         $totalFocus = (clone $base)->sum('focus_time');
         $totalUnfocus = (clone $base)->sum('unfocus_time');
+        $totalCvDistract = (clone $base)->sum('cv_distract_time');
         $sessionCount = (clone $base)->count();
         $avgScore = (clone $base)->avg('focus_score');
         $bestSession = (clone $base)
@@ -138,6 +138,7 @@ class ProfileController extends Controller
             'focus' => [
                 'total_focus_seconds' => (int) $totalFocus,
                 'total_unfocus_seconds' => (int) $totalUnfocus,
+                'total_cv_distract_seconds' => (int) $totalCvDistract,
                 'total_seconds' => (int) ($totalFocus + $totalUnfocus),
                 'avg_focus_score' => round($avgScore ?? 0, 1),
                 'session_count' => $sessionCount,

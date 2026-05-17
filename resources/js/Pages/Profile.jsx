@@ -205,11 +205,29 @@ export default function Profile() {
                                 />
                                 <SummaryCard
                                     label="Top Topic"
-                                    value={focus.top_topic || "—"}
+                                    value={focus.top_topic || "-"}
                                     accent="from-[#00E2E0] to-[#01A9F2]"
                                     isText
                                 />
                             </div>
+
+                            {focus.total_cv_distract_seconds > 0 && (
+                                <div className="mt-5 p-4 rounded-2xl border border-[#01A9F2]/40 bg-[#BAFFFE]/20 dark:bg-[#172D9D]/20">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <i className="fa-solid fa-eye text-[#01A9F2] dark:text-[#797CFF]"></i>
+                                        <span className="text-xs uppercase tracking-wide font-bold text-[#01A9F2] dark:text-[#797CFF]">
+                                            Eye Tracking Insights
+                                        </span>
+                                    </div>
+                                    <p className="text-sm text-gray-700 dark:text-gray-200">
+                                        Computer Vision detected <strong>{formatDuration(focus.total_cv_distract_seconds)}</strong> of distraction
+                                        ({Math.round((focus.total_cv_distract_seconds / Math.max(1, focus.total_unfocus_seconds)) * 100)}% of total unfocus time).
+                                    </p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        Mata tertutup, menoleh, atau wajah tidak terdeteksi dari kamera.
+                                    </p>
+                                </div>
+                            )}
 
                             {focus.total_seconds > 0 && (
                                 <div className="mt-6">
@@ -283,7 +301,7 @@ export default function Profile() {
                                                 {d.label}
                                             </div>
                                             <div className="text-xs text-gray-400 dark:text-gray-500">
-                                                {d.avg_score > 0 ? `${d.avg_score}%` : "—"}
+                                                {d.avg_score > 0 ? `${d.avg_score}%` : "-"}
                                             </div>
                                         </div>
                                     );
@@ -346,7 +364,9 @@ export default function Profile() {
                                                                 {s.video?.title || "Deleted video"}
                                                             </div>
                                                             <div className="text-xs text-gray-500 dark:text-gray-400">
-                                                                {formatDuration(s.focus_time)} focused · {formatRelative(s.created_at)}
+                                                                {formatDuration(s.focus_time)} focused
+                                                            <span className="mx-1.5"><i className="fa-solid fa-circle text-[3px] align-middle"></i></span>
+                                                            {formatRelative(s.created_at)}
                                                             </div>
                                                         </div>
 

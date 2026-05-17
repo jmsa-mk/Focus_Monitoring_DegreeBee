@@ -19,8 +19,7 @@ class CommentController extends Controller
 
         $video = Video::findOrFail($videoId);
 
-        // Ensure parent (if any) belongs to same video & is itself a top-level comment
-        // (we only allow 1 nesting level — replies to replies still attach to the top thread)
+
         $parentId = null;
         if ($request->parent_id) {
             $parent = Comment::find($request->parent_id);

@@ -54,7 +54,9 @@ function FileAttachmentChip({ url, name, size }) {
                     </div>
                     {size > 0 && (
                         <div className="text-xs text-gray-500 dark:text-gray-400">
-                            {formatBytes(size)} · Click to preview
+                            {formatBytes(size)}
+                            <span className="mx-1.5"><i className="fa-solid fa-circle text-[3px] align-middle"></i></span>
+                            Click to preview
                         </div>
                     )}
                 </div>
@@ -571,7 +573,6 @@ function ForumPostItem({ post, classId, currentUserId, isReply = false }) {
                     : "p-5 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm"
             }`}
         >
-            {/* Avatar */}
             {post.user?.avatar_url ? (
                 <img
                     src={post.user.avatar_url}
@@ -602,7 +603,6 @@ function ForumPostItem({ post, classId, currentUserId, isReply = false }) {
                     </span>
                 </div>
 
-                {/* Body / Edit */}
                 {editing ? (
                     <div className="mt-2">
                         <textarea
@@ -654,7 +654,6 @@ function ForumPostItem({ post, classId, currentUserId, isReply = false }) {
                     </>
                 )}
 
-                {/* Actions */}
                 {!editing && (
                     <div className="flex items-center gap-4 mt-3 text-xs">
                         <button
@@ -706,7 +705,6 @@ function ForumPostItem({ post, classId, currentUserId, isReply = false }) {
                     </div>
                 )}
 
-                {/* Reply composer */}
                 {showReplyBox && (
                     <div className={`mt-3 p-3 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700
                         ${submitting ? "opacity-95 pointer-events-none" : ""}`}>
@@ -754,7 +752,6 @@ function ForumPostItem({ post, classId, currentUserId, isReply = false }) {
                             </div>
                         )}
 
-                        {/* Reply upload progress */}
                         {submitting && replyFile && (
                             <div className="mt-3 p-2 rounded-lg bg-[#BAFFFE]/30 dark:bg-[#172D9D]/20 border border-[#01A9F2]/40">
                                 <div className="flex items-center justify-between text-xs mb-1">
@@ -820,7 +817,6 @@ function ForumPostItem({ post, classId, currentUserId, isReply = false }) {
                     </div>
                 )}
 
-                {/* Replies */}
                 {post.replies?.length > 0 && (
                     <ul className="mt-4 space-y-4 pl-2 border-l-2 border-gray-100 dark:border-gray-700">
                         {post.replies.map((r) => (
@@ -835,7 +831,6 @@ function ForumPostItem({ post, classId, currentUserId, isReply = false }) {
                     </ul>
                 )}
 
-                {/* Delete confirm */}
                 {confirmDelete && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
                         <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6 w-[90%] max-w-sm

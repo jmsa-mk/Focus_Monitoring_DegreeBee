@@ -2,6 +2,7 @@ import { Head, usePage, router } from "@inertiajs/react";
 import Navbar from "../Component/Navbar";
 import StarRating from "../Component/StarRating";
 import CommentSection from "../Component/CommentSection";
+import { useFaceTracker } from "../Component/useFaceTracker";
 import { useEffect, useRef, useState, useCallback } from "react";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -157,6 +158,7 @@ export default function VideoDetail() {
     const [focusState, setFocusState] = useState(STATE.FOCUSED);
     const [focusTime, setFocusTime] = useState(0);
     const [unfocusTime, setUnfocusTime] = useState(0);
+    const [cvDistractTime, setCvDistractTime] = useState(0);
     const [showOverlay, setShowOverlay] = useState(false);
     const [rating, setRating] = useState(userRating || 0);
     const [hoverRating, setHoverRating] = useState(0);
@@ -164,8 +166,25 @@ export default function VideoDetail() {
     const [summaryData, setSummaryData] = useState(null);
     const [savingSession, setSavingSession] = useState(false);
 
+    // Face tracking (Computer Vision)
+    const [cvEnabled, setCvEnabled] = useState(false);
+    const [showCamera, setShowCamera] = useState(true);
+    const faceTracker = useFaceTracker(cvEnabled);
+    const faceAwaySinceRef = useRef(null); 
+    const eyesClosedSinceRef = useRef(null);
+    const lookingAwaySinceRef = useRef(null);
+    const cvSignalRef = useRef("ok");
+    const cvEnabledRef = useRef(false);
+    const faceStateRef = useRef({
+        facePresent: null,
+        eyesClosed: null,
+        lookingAway: null,
+    });
+    const faceReadyRef = useRef(false);
+
     const focusTimeRef = useRef(0);
     const unfocusTimeRef = useRef(0);
+    const cvDistractTimeRef = useRef(0);
     const lastActivityRef = useRef(Date.now());
     const stateStartRef = useRef(Date.now());
     const stateRef = useRef(STATE.FOCUSED);
@@ -178,7 +197,23 @@ export default function VideoDetail() {
     useEffect(() => {
         focusTimeRef.current = focusTime;
         unfocusTimeRef.current = unfocusTime;
-    }, [focusTime, unfocusTime]);
+        cvDistractTimeRef.current = cvDistractTime;
+    }, [focusTime, unfocusTime, cvDistractTime]);
+
+    useEffect(() => {
+        cvEnabledRef.current = cvEnabled;
+        if (!cvEnabled) {
+            faceAwaySinceRef.current = null;
+            eyesClosedSinceRef.current = null;
+            lookingAwaySinceRef.current = null;
+            cvSignalRef.current = "ok";
+        }
+    }, [cvEnabled]);
+
+    useEffect(() => {
+        faceStateRef.current = faceTracker.state;
+        faceReadyRef.current = faceTracker.ready;
+    }, [faceTracker.state, faceTracker.ready]);
 
     useEffect(() => {
         stateRef.current = focusState;
@@ -282,6 +317,67 @@ export default function VideoDetail() {
             const now = Date.now();
             const current = stateRef.current;
 
+            const CV_THRESHOLD_MS = 3000;
+            if (cvEnabledRef.current && faceReadyRef.current) {
+                const fs = faceStateRef.current;
+
+                if (fs.facePresent === false) {
+                    faceAwaySinceRef.current = faceAwaySinceRef.current || now;
+                } else {
+                    faceAwaySinceRef.current = null;
+                }
+
+                if (fs.eyesClosed === true) {
+                    eyesClosedSinceRef.current = eyesClosedSinceRef.current || now;
+                } else {
+                    eyesClosedSinceRef.current = null;
+                }
+
+                if (fs.lookingAway === true) {
+                    lookingAwaySinceRef.current = lookingAwaySinceRef.current || now;
+                } else {
+                    lookingAwaySinceRef.current = null;
+                }
+
+                let signal = "ok";
+                if (faceAwaySinceRef.current && now - faceAwaySinceRef.current >= CV_THRESHOLD_MS) {
+                    signal = "no_face";
+                } else if (eyesClosedSinceRef.current && now - eyesClosedSinceRef.current >= CV_THRESHOLD_MS) {
+                    signal = "drowsy";
+                } else if (lookingAwaySinceRef.current && now - lookingAwaySinceRef.current >= CV_THRESHOLD_MS) {
+                    signal = "looking_away";
+                }
+
+                const prevSignal = cvSignalRef.current;
+                cvSignalRef.current = signal;
+
+                if (signal !== "ok" && (current === STATE.FOCUSED || current === STATE.IDLE)) {
+                    setFocusState(STATE.DISTRACTED);
+                    if (prevSignal === "ok") {
+                        const messages = {
+                            no_face: "Wajah tidak terdeteksi, sedang dimana?",
+                            drowsy: "Mata kamu tertutup, ngantuk?",
+                            looking_away: "Kamu sedang menoleh, kembali fokus ya",
+                        };
+                        const iconClass = signal === "drowsy"
+                            ? "fa-solid fa-bed text-yellow-500"
+                            : signal === "no_face"
+                            ? "fa-solid fa-user-slash text-red-500"
+                            : "fa-solid fa-eye text-orange-500";
+                        toast(messages[signal], {
+                            icon: <i className={iconClass}></i>,
+                            duration: 4000,
+                        });
+                    }
+                    return;
+                }
+
+                if (signal === "ok" && current === STATE.DISTRACTED && !document.hidden && isVideoPlayingRef.current && prevSignal !== "ok") {
+                    setFocusState(STATE.FOCUSED);
+                    lastActivityRef.current = now;
+                }
+            }
+
             if (
                 current === STATE.FOCUSED &&
                 !document.hidden &&
@@ -301,9 +397,11 @@ export default function VideoDetail() {
             } else {
 
                 setUnfocusTime((t) => t + 1);
+                if (cvEnabledRef.current && cvSignalRef.current !== "ok") {
+                    setCvDistractTime((t) => t + 1);
+                }
             }
 
-            // Trigger tiered warnings
             const elapsedInState = Math.floor((now - stateStartRef.current) / 1000);
 
             if (current === STATE.DISTRACTED) {
@@ -335,11 +433,14 @@ export default function VideoDetail() {
     const triggerWarning = useCallback((tier) => {
         switch (tier.level) {
             case "info":
-                toast(tier.message, { icon: "💤", duration: 4000 });
+                toast(tier.message, {
+                    icon: <i className="fa-solid fa-bed text-blue-500"></i>,
+                    duration: 4000,
+                });
                 break;
             case "warn":
                 toast(tier.message, {
-                    icon: "⚠️",
+                    icon: <i className="fa-solid fa-triangle-exclamation text-yellow-600"></i>,
                     duration: 4000,
                     style: {
                         background: "#FEF3C7",
@@ -375,6 +476,7 @@ export default function VideoDetail() {
             total_time: total,
             focus_time: focusTimeRef.current,
             unfocus_time: unfocusTimeRef.current,
+            cv_distract_time: cvDistractTimeRef.current,
         };
 
         const payload = JSON.stringify(data);
@@ -413,6 +515,7 @@ export default function VideoDetail() {
     const openSummary = useCallback(() => {
         const f = focusTimeRef.current;
         const u = unfocusTimeRef.current;
+        const cv = cvDistractTimeRef.current;
         const total = f + u;
 
         if (total < 5) {
@@ -434,6 +537,8 @@ export default function VideoDetail() {
         setSummaryData({
             focus: f,
             unfocus: u,
+            cvDistract: cv,
+            cvEnabled: cvEnabledRef.current,
             total,
             score: sessionScore,
             newAchievements,
@@ -449,6 +554,7 @@ export default function VideoDetail() {
 
         setFocusTime(0);
         setUnfocusTime(0);
+        setCvDistractTime(0);
         sessionSavedRef.current = false;
         lastActivityRef.current = Date.now();
 
@@ -466,6 +572,7 @@ export default function VideoDetail() {
         sessionSavedRef.current = true;
         setFocusTime(0);
         setUnfocusTime(0);
+        setCvDistractTime(0);
         setShowSummary(false);
         setSummaryData(null);
         setTimeout(() => {
@@ -559,7 +666,7 @@ export default function VideoDetail() {
 
                         {focusState === STATE.PAUSED && (
                             <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 italic">
-                                Tracking paused — video tidak diputar
+                                Tracking paused, video tidak diputar
                             </p>
                         )}
 
@@ -589,6 +696,99 @@ export default function VideoDetail() {
                                 </div>
                                 <div>Total</div>
                             </div>
+                        </div>
+
+                        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                            <div className="flex items-center justify-between mb-2">
+                                <label className="inline-flex items-center gap-2 text-xs font-semibold text-gray-700 dark:text-gray-200 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={cvEnabled}
+                                        onChange={(e) => setCvEnabled(e.target.checked)}
+                                        className="w-4 h-4 accent-[#01A9F2]"
+                                    />
+                                    <i className="fa-solid fa-eye"></i>
+                                    Eye Tracking
+                                </label>
+                                {cvEnabled && faceTracker.ready && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowCamera(!showCamera)}
+                                        className="text-xs text-gray-500 dark:text-gray-400 hover:text-[#01A9F2]"
+                                        title={showCamera ? "Hide preview" : "Show preview"}
+                                    >
+                                        <i className={showCamera ? "fa-solid fa-eye-slash" : "fa-solid fa-eye"}></i>
+                                    </button>
+                                )}
+                            </div>
+
+                            {cvEnabled && (
+                                <div className="space-y-2">
+                                    {faceTracker.loading && (
+                                        <div className="text-xs text-gray-500 dark:text-gray-400 inline-flex items-center gap-2">
+                                            <i className="fa-solid fa-spinner fa-spin"></i>
+                                            Loading model & camera...
+                                        </div>
+                                    )}
+
+                                    {faceTracker.error && (
+                                        <div className="text-xs text-red-500 inline-flex items-center gap-2">
+                                            <i className="fa-solid fa-triangle-exclamation"></i>
+                                            {faceTracker.error}
+                                        </div>
+                                    )}
+
+                                    <video
+                                        ref={faceTracker.videoRef}
+                                        playsInline
+                                        muted
+                                        className={`w-full rounded-lg border border-gray-200 dark:border-gray-700
+                                            ${showCamera && faceTracker.ready ? "" : "hidden"}`}
+                                        style={{ transform: "scaleX(-1)" }}
+                                    />
+
+                                    {faceTracker.ready && (
+                                        <div className="grid grid-cols-3 gap-1 text-[10px] text-center">
+                                            <div className={`rounded px-1 py-1 ${
+                                                faceTracker.state.facePresent === false
+                                                    ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
+                                                    : faceTracker.state.facePresent
+                                                    ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+                                                    : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+                                            }`}>
+                                                <i className="fa-solid fa-user mb-0.5"></i>
+                                                <div>{faceTracker.state.facePresent === false ? "Hilang" : "Wajah"}</div>
+                                            </div>
+                                            <div className={`rounded px-1 py-1 ${
+                                                faceTracker.state.eyesClosed
+                                                    ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300"
+                                                    : faceTracker.state.facePresent
+                                                    ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+                                                    : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+                                            }`}>
+                                                <i className="fa-solid fa-eye mb-0.5"></i>
+                                                <div>{faceTracker.state.eyesClosed ? "Tutup" : "Mata"}</div>
+                                            </div>
+                                            <div className={`rounded px-1 py-1 ${
+                                                faceTracker.state.lookingAway
+                                                    ? "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300"
+                                                    : faceTracker.state.facePresent
+                                                    ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+                                                    : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+                                            }`}>
+                                                <i className="fa-solid fa-arrows-up-down-left-right mb-0.5"></i>
+                                                <div>{faceTracker.state.lookingAway ? "Menoleh" : "Lurus"}</div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {!faceTracker.ready && !faceTracker.loading && !faceTracker.error && (
+                                        <p className="text-[10px] text-gray-500 dark:text-gray-400 italic">
+                                            Webcam akan diminta. Pemrosesan 100% lokal di browser.
+                                        </p>
+                                    )}
+                                </div>
+                            )}
                         </div>
 
                         <button
@@ -831,6 +1031,45 @@ export default function VideoDetail() {
                                         </div>
                                     </div>
                                 </div>
+
+                                {/* CV Breakdown */}
+                                {summaryData.cvEnabled && summaryData.unfocus > 0 && (
+                                    <div className="rounded-2xl border border-[#01A9F2]/40 p-4 bg-[#BAFFFE]/20 dark:bg-[#172D9D]/20">
+                                        <div className="text-xs uppercase tracking-wide text-[#01A9F2] dark:text-[#797CFF] font-bold mb-2 inline-flex items-center gap-2">
+                                            <i className="fa-solid fa-eye"></i>
+                                            Eye Tracking Detection
+                                        </div>
+
+                                        {summaryData.cvDistract > 0 ? (
+                                            <>
+                                                <div className="flex items-baseline justify-between text-sm mb-2">
+                                                    <span className="text-gray-600 dark:text-gray-300">
+                                                        CV detected distraction
+                                                    </span>
+                                                    <span className="font-bold text-gray-900 dark:text-white">
+                                                        {formatTime(summaryData.cvDistract)}
+                                                    </span>
+                                                </div>
+                                                <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                    <div
+                                                        className="h-full bg-linear-to-r from-[#00E2E0] to-[#797CFF]"
+                                                        style={{
+                                                            width: `${Math.min(100, (summaryData.cvDistract / summaryData.unfocus) * 100)}%`,
+                                                        }}
+                                                    />
+                                                </div>
+                                                <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                                    {Math.round((summaryData.cvDistract / summaryData.unfocus) * 100)}% dari distraction dideteksi oleh kamera (mata tertutup / menoleh / wajah hilang).
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="text-xs text-emerald-600 dark:text-emerald-400 inline-flex items-center gap-1.5">
+                                                <i className="fa-solid fa-circle-check"></i>
+                                                Tidak ada distraksi terdeteksi oleh kamera. Sisanya karena pindah tab atau idle.
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
 
                                 {summaryData.leveledUp && (
                                     <div className="rounded-2xl border-2 border-[#797CFF] dark:border-[#172D9D]
