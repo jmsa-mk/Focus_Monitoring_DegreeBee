@@ -3,6 +3,7 @@ import Navbar from "../Component/Navbar";
 import StarRating from "../Component/StarRating";
 import CommentSection from "../Component/CommentSection";
 import { useFaceTracker } from "../Component/useFaceTracker";
+import { useVirtualBackground } from "../Component/useVirtualBackground";
 import { useEffect, useRef, useState, useCallback } from "react";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -169,7 +170,13 @@ export default function VideoDetail() {
     // Face tracking (Computer Vision)
     const [cvEnabled, setCvEnabled] = useState(false);
     const [showCamera, setShowCamera] = useState(true);
+    const [bgMode, setBgMode] = useState("none");
     const faceTracker = useFaceTracker(cvEnabled);
+    const virtualBg = useVirtualBackground({
+        videoRef: faceTracker.videoRef,
+        enabled: cvEnabled && faceTracker.ready && bgMode !== "none",
+        mode: bgMode,
+    });
     const faceAwaySinceRef = useRef(null); 
     const eyesClosedSinceRef = useRef(null);
     const lookingAwaySinceRef = useRef(null);
@@ -738,14 +745,70 @@ export default function VideoDetail() {
                                         </div>
                                     )}
 
-                                    <video
-                                        ref={faceTracker.videoRef}
-                                        playsInline
-                                        muted
-                                        className={`w-full rounded-lg border border-gray-200 dark:border-gray-700
-                                            ${showCamera && faceTracker.ready ? "" : "hidden"}`}
-                                        style={{ transform: "scaleX(-1)" }}
-                                    />
+                                    <div className={`relative w-full rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700
+                                        ${showCamera && faceTracker.ready ? "" : "hidden"}`}>
+                                        <video
+                                            ref={faceTracker.videoRef}
+                                            playsInline
+                                            muted
+                                            className={`w-full block ${bgMode !== "none" ? "invisible absolute inset-0" : ""}`}
+                                            style={{ transform: "scaleX(-1)" }}
+                                        />
+                                        {bgMode !== "none" && (
+                                            <canvas
+                                                ref={virtualBg.canvasRef}
+                                                className="w-full block"
+                                                style={{ transform: "scaleX(-1)" }}
+                                            />
+                                        )}
+                                    </div>
+
+                                    {faceTracker.ready && (
+                                        <div className="flex items-center gap-1 flex-wrap">
+                                            <span className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 mr-1 inline-flex items-center gap-1">
+                                                <i className="fa-solid fa-image"></i>
+                                                BG:
+                                            </span>
+                                            <BgPickerButton
+                                                active={bgMode === "none"}
+                                                onClick={() => setBgMode("none")}
+                                                title="None (raw camera)"
+                                            >
+                                                <i className="fa-solid fa-ban text-gray-400"></i>
+                                            </BgPickerButton>
+                                            <BgPickerButton
+                                                active={bgMode === "blur"}
+                                                onClick={() => setBgMode("blur")}
+                                                title="Blur background"
+                                            >
+                                                <i className="fa-solid fa-droplet text-gray-500"></i>
+                                            </BgPickerButton>
+                                            <BgPickerButton
+                                                active={bgMode === "palette"}
+                                                onClick={() => setBgMode("palette")}
+                                                title="Palette gradient"
+                                                style={{ background: "linear-gradient(135deg,#00E2E0,#797CFF)" }}
+                                            />
+                                            <BgPickerButton
+                                                active={bgMode === "ocean"}
+                                                onClick={() => setBgMode("ocean")}
+                                                title="Ocean"
+                                                style={{ background: "linear-gradient(135deg,#01A9F2,#172D9D)" }}
+                                            />
+                                            <BgPickerButton
+                                                active={bgMode === "library"}
+                                                onClick={() => setBgMode("library")}
+                                                title="Library"
+                                                style={{ background: "linear-gradient(135deg,#213A58,#0C2D34)" }}
+                                            />
+                                            <BgPickerButton
+                                                active={bgMode === "dark"}
+                                                onClick={() => setBgMode("dark")}
+                                                title="Dark"
+                                                style={{ background: "#0F172A" }}
+                                            />
+                                        </div>
+                                    )}
 
                                     {faceTracker.ready && (
                                         <div className="grid grid-cols-3 gap-1 text-[10px] text-center">
@@ -1173,5 +1236,23 @@ export default function VideoDetail() {
                 )}
             </div>
         </>
+    );
+}
+
+function BgPickerButton({ active, onClick, title, style, children }) {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            title={title}
+            style={style}
+            className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 transition
+                border-2 ${active
+                    ? "border-[#01A9F2] ring-2 ring-[#01A9F2]/30"
+                    : "border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500"
+                }`}
+        >
+            {children}
+        </button>
     );
 }

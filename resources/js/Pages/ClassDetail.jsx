@@ -2,12 +2,14 @@ import { Head, Link, usePage, useForm, router } from "@inertiajs/react";
 import { useState } from "react";
 import Navbar from "../Component/Navbar";
 import ForumSection from "../Component/ForumSection";
+import NotesSection from "../Component/NotesSection";
+import QuestionBankSection from "../Component/QuestionBankSection";
 
 export default function ClassDetail() {
     const [activeTab, setActiveTab] = useState("description");
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    const { class: classData, isCreator, isEnrolled, forumPosts, auth } = usePage().props;
+    const { class: classData, isCreator, isEnrolled, forumPosts, notes, questionBankFiles, auth } = usePage().props;
 
     const { data, setData, post, processing, reset } = useForm({
         youtube_link: "",
@@ -105,11 +107,17 @@ export default function ClassDetail() {
                         Forum
                     </button>
 
-                    <button className="block mb-4 font-semibold text-gray-400 dark:text-gray-500">
+                    <button
+                        onClick={() => handleTabClick("notes")}
+                        className="block mb-4 font-semibold text-gray-900 dark:text-white hover:text-[#01A9F2] dark:hover:text-[#01A9F2]"
+                    >
                         Notes
                     </button>
 
-                    <button className="block font-semibold text-gray-400 dark:text-gray-500">
+                    <button
+                        onClick={() => handleTabClick("questionBank")}
+                        className="block font-semibold text-gray-900 dark:text-white hover:text-[#01A9F2] dark:hover:text-[#01A9F2]"
+                    >
                         Question Bank
                     </button>
 
@@ -281,6 +289,22 @@ export default function ClassDetail() {
                         {activeTab === "forum" && (
                             <ForumSection
                                 posts={forumPosts || []}
+                                classId={classData.id}
+                                currentUserId={auth?.user?.id}
+                            />
+                        )}
+
+                        {activeTab === "notes" && (
+                            <NotesSection
+                                notes={notes || []}
+                                classId={classData.id}
+                                currentUserId={auth?.user?.id}
+                            />
+                        )}
+
+                        {activeTab === "questionBank" && (
+                            <QuestionBankSection
+                                files={questionBankFiles || []}
                                 classId={classData.id}
                                 currentUserId={auth?.user?.id}
                             />

@@ -7,6 +7,8 @@ use App\Http\Controllers\ClassVideoController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\EnrollmentsController;
 use App\Http\Controllers\ForumPostController;
+use App\Http\Controllers\NoteController;
+use App\Http\Controllers\QuestionBankController;
 use App\Http\Controllers\FocusLogController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VideoController;
@@ -99,10 +101,18 @@ Route::prefix('classes/{classId}')->middleware('auth')->group(function () {
     Route::delete('/videos/{id}', [ClassVideoController::class, 'destroy']);
 
     Route::post('/forum', [ForumPostController::class, 'store'])->name('forum.store');
+    Route::post('/notes', [NoteController::class, 'store'])->name('notes.store');
+    Route::post('/question-bank', [QuestionBankController::class, 'store'])->name('questionBank.store');
 });
 
 Route::middleware('auth')->group(function () {
     Route::put('/forum/{post}', [ForumPostController::class, 'update'])->name('forum.update');
     Route::delete('/forum/{post}', [ForumPostController::class, 'destroy'])->name('forum.destroy');
     Route::post('/forum/{post}/insight', [ForumPostController::class, 'toggleInsight'])->name('forum.insight');
+
+    Route::put('/notes/{note}', [NoteController::class, 'update'])->name('notes.update');
+    Route::delete('/notes/{note}', [NoteController::class, 'destroy'])->name('notes.destroy');
+
+    Route::put('/question-bank/{file}', [QuestionBankController::class, 'update'])->name('questionBank.update');
+    Route::delete('/question-bank/{file}', [QuestionBankController::class, 'destroy'])->name('questionBank.destroy');
 });

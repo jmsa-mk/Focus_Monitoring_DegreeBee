@@ -97,6 +97,22 @@ class ClassesController extends Controller
             abort(403, 'This class is private.');
         }
 
+        $notes = [];
+        if ($isCreator || $isEnrolled) {
+            $notes = \App\Models\Note::where('class_id', $class->id)
+                ->with('user')
+                ->latest()
+                ->get();
+        }
+        
+        $questionBankFiles = [];
+        if ($isCreator || $isEnrolled) {
+            $questionBankFiles = \App\Models\QuestionBankFile::where('class_id', $class->id)
+                ->with('user')
+                ->latest()
+                ->get();
+        }
+
         $forumPosts = [];
         if ($isCreator || $isEnrolled) {
             $replyLoader = function ($q) use ($userId) {
@@ -121,6 +137,8 @@ class ClassesController extends Controller
             'isCreator' => $isCreator,
             'isEnrolled' => $isEnrolled,
             'forumPosts' => $forumPosts,
+            'notes' => $notes,
+            'questionBankFiles' => $questionBankFiles,
         ]);
     }
 

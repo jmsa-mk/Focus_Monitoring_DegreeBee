@@ -19,7 +19,6 @@ class CommentController extends Controller
 
         $video = Video::findOrFail($videoId);
 
-
         $parentId = null;
         if ($request->parent_id) {
             $parent = Comment::find($request->parent_id);
