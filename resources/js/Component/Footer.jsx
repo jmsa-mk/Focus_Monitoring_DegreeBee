@@ -11,12 +11,10 @@ export default function Footer() {
 
         <div className="w-full bg-white backdrop-blur-md px-10 py-12 shadow-xl dark:bg-gray-800">
 
-            {/* Top grid */}
             <div className="px-6 sm:px-10 md:px-12 lg:px-32 gap-10 items-start
                 grid grid-cols-1 md:grid-cols-[1.2fr_1fr_1.2fr_auto]
             ">
 
-            {/* Column 1 */}
             <div>
                 <h3 className="font-bold text-gray-900 mb-3 dark:text-white">
                     BeeLearning
@@ -28,7 +26,6 @@ export default function Footer() {
                 </p>
             </div>
 
-            {/* Column 2 - support */}
             <div>
                 <h3 className="font-bold text-gray-900 mb-3 dark:text-white">
                     Support
@@ -49,7 +46,6 @@ export default function Footer() {
                 </ul>
             </div>
 
-            {/* COlumn 3 - coonection*/}
             <div>
                 <h3 className="font-bold text-gray-900 mb-3 dark:text-white">
                 Connect
@@ -68,7 +64,6 @@ export default function Footer() {
                 </p>
             </div>
 
-            {/* Column 4 - Social*/}
             <div className="flex md:justify-end gap-3 flex-col">
 
                 <div className="w-9 h-9 flex items-center justify-center rounded-md bg-blue-600 text-white cursor-pointer">

@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 
-/**
- * Utility: pick FontAwesome icon class for a filename by extension.
- */
+
 export function fileIconClass(name) {
     const ext = (name || "").split(".").pop().toLowerCase();
     if (ext === "pdf") return "fa-solid fa-file-pdf text-red-500";
@@ -15,9 +13,7 @@ export function fileIconClass(name) {
     return "fa-solid fa-file text-gray-500";
 }
 
-/**
- * Utility: format byte count to human-readable string.
- */
+
 export function formatBytes(bytes) {
     if (!bytes) return "";
     if (bytes < 1024) return `${bytes} B`;
@@ -25,17 +21,7 @@ export function formatBytes(bytes) {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-/**
- * FilePreviewModal: full-screen preview dialog for a stored file.
- *
- * Renders inline preview when possible:
- *   image    : <img>
- *   pdf      : <iframe>
- *   txt/csv  : fetched plain text in <pre>
- *   other    : fallback message + download CTA
- *
- * ESC and click-outside close. Header has Download button + close.
- */
+
 export default function FilePreviewModal({ url, name, size, onClose }) {
     const ext = (name || "").split(".").pop().toLowerCase();
     const isImage = ["jpg", "jpeg", "png", "webp", "gif"].includes(ext);

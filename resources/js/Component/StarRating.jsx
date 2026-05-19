@@ -1,19 +1,4 @@
-/**
- * StarRating: display-only rating with half-star support.
- *
- * Renders 5 stars filled according to `value`:
- *   value=4.7 -> 5 full stars
- *   value=4.3 -> 4 full + 1 half stroke
- *   value=3.0 -> 3 full + 2 empty
- *
- * Props:
- *   value     : number 0..5
- *   size      : Tailwind text size (default "text-base")
- *   color     : Tailwind color class for filled stars (default "text-yellow-400")
- *   showValue : append numeric value next to stars
- *   showCount : append (count) after value
- *   count     : review count, shown when showCount=true
- */
+
 export default function StarRating({
     value = 0,
     size = "text-base",
@@ -27,7 +12,7 @@ export default function StarRating({
 
     const stars = [];
     for (let i = 1; i <= 5; i++) {
-        const diff = v - i + 1; // how much of this star is filled
+        const diff = v - i + 1; 
         if (diff >= 0.75) {
             stars.push(
                 <i key={i} className={`fa-solid fa-star ${color}`} />

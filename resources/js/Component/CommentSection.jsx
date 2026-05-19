@@ -53,7 +53,6 @@ export default function CommentSection({ comments = [], videoId, currentUserId }
                 </span>
             </h2>
 
-            {/* Composer */}
             <div className="mb-8 flex gap-3">
                 <div className="flex-1">
                     <textarea
@@ -98,7 +97,6 @@ export default function CommentSection({ comments = [], videoId, currentUserId }
                 </div>
             </div>
 
-            {/* Comments list */}
             {comments.length === 0 ? (
                 <div className="text-center py-12 text-gray-500 dark:text-gray-400">
                     <i className="fa-regular fa-comments text-5xl mb-3"></i>
@@ -202,9 +200,7 @@ function CommentItem({ comment, videoId, currentUserId, isReply = false }) {
                 </div>
             )}
 
-            {/* Content */}
             <div className="flex-1 min-w-0">
-                {/* Header */}
                 <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-semibold text-sm text-gray-900 dark:text-white">
                         {comment.user?.name || "Anonymous"}
@@ -217,7 +213,6 @@ function CommentItem({ comment, videoId, currentUserId, isReply = false }) {
                     </span>
                 </div>
 
-                {/* Body or Edit */}
                 {editing ? (
                     <div className="mt-2">
                         <textarea
@@ -260,7 +255,6 @@ function CommentItem({ comment, videoId, currentUserId, isReply = false }) {
                     </p>
                 )}
 
-                {/* Actions */}
                 {!editing && (
                     <div className="flex items-center gap-4 mt-2 text-xs">
                         <button
@@ -312,7 +306,6 @@ function CommentItem({ comment, videoId, currentUserId, isReply = false }) {
                     </div>
                 )}
 
-                {/* Reply composer */}
                 {showReplyBox && (
                     <div className="mt-3">
                         <textarea
@@ -357,7 +350,6 @@ function CommentItem({ comment, videoId, currentUserId, isReply = false }) {
                     </div>
                 )}
 
-                {/* Replies */}
                 {comment.replies?.length > 0 && (
                     <ul className="mt-4 space-y-4">
                         {comment.replies.map((r) => (
@@ -372,7 +364,6 @@ function CommentItem({ comment, videoId, currentUserId, isReply = false }) {
                     </ul>
                 )}
 
-                {/* Delete confirm modal */}
                 {confirmDelete && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
                         <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6 w-[90%] max-w-sm

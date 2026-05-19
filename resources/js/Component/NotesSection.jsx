@@ -105,7 +105,6 @@ export default function NotesSection({ notes = [], classId, currentUserId }) {
                 </button>
             </div>
 
-            {/* Composer modal */}
             {showComposer && (
                 <NoteComposer
                     classId={classId}
@@ -113,7 +112,6 @@ export default function NotesSection({ notes = [], classId, currentUserId }) {
                 />
             )}
 
-            {/* Empty state */}
             {notes.length === 0 ? (
                 <div className="text-center py-20 text-gray-500 dark:text-gray-400">
                     <i className="fa-regular fa-note-sticky text-7xl mb-4 text-gray-300 dark:text-gray-600"></i>
@@ -169,12 +167,10 @@ function NoteCard({ note, classId, currentUserId }) {
                     hover:shadow-md transition group relative
                     ${c.light} ${c.dark}`}
             >
-                {/* Body */}
                 <p className={`${c.text} text-sm whitespace-pre-wrap break-words leading-relaxed mb-3`}>
                     {note.body}
                 </p>
 
-                {/* Footer: author + actions */}
                 <div className="flex items-center justify-between gap-2 pt-2 border-t border-current/10">
                     <div className={`text-xs ${c.subtle} inline-flex items-center gap-1.5 min-w-0`}>
                         {note.user?.avatar_url ? (
@@ -219,7 +215,6 @@ function NoteCard({ note, classId, currentUserId }) {
                 </div>
             </div>
 
-            {/* Delete confirmation */}
             {confirmDelete && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
                     <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6 w-[90%] max-w-sm
@@ -329,7 +324,6 @@ function NoteComposer({ classId, existing = null, onClose }) {
                             focus:outline-none focus:ring-2 focus:ring-current/30`}
                     />
 
-                    {/* Color palette */}
                     <div className="mt-4">
                         <div className={`text-xs font-semibold mb-2 ${c.subtle}`}>
                             <i className="fa-solid fa-palette mr-1"></i>
@@ -355,7 +349,6 @@ function NoteComposer({ classId, existing = null, onClose }) {
                         </div>
                     </div>
 
-                    {/* Actions */}
                     <div className="flex justify-end gap-2 mt-5">
                         <button
                             type="button"

@@ -30,7 +30,6 @@ export default function Navbar() {
     router.post('/logout');
   };
 
-  // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -46,13 +45,11 @@ export default function Navbar() {
     <nav className="w-full p-4">
       <div className="max-w-7xl mx-auto mt-3.5 bg-white dark:bg-gray-800 rounded-full px-8 py-3 flex items-center justify-between shadow-md">
 
-        {/* Left (Logo) */}
         <Link href="/explore" className="flex items-center gap-3">
           <img src={Logo} alt="DegreeBee" className="w-10 h-10 object-contain"/>
           <span className="text-xl font-bold text-gray-900 dark:text-white">DegreeBee</span>
         </Link>
 
-        {/* Center Links */}
         <div className="hidden md:flex items-center gap-10 text-gray-700 dark:text-gray-200 font-medium">
           <Link href="/" className="hover:text-black dark:hover:text-white">Home</Link>
           <Link href={user ? "/explore" : "/register"} className="hover:text-black dark:hover:text-white">Explore Videos</Link>
@@ -60,7 +57,6 @@ export default function Navbar() {
           <Link href="/premium" className="hover:text-black dark:hover:text-white">Premium</Link>
         </div>
 
-        {/* Right */}
         <div className="flex items-center gap-3">
           {!user && (
             <Link
@@ -77,7 +73,12 @@ export default function Navbar() {
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 className="flex items-center gap-2"
               >
-                <span className="font-semibold text-gray-900 dark:text-white">{user.name ?? user.email}</span>
+                <span className="font-semibold text-gray-900 dark:text-white inline-flex items-center gap-1.5">
+                  {user.name ?? user.email}
+                  {user.is_premium && (
+                    <i className="fa-solid fa-crown text-yellow-500 text-xs" title={user.subscription_label}></i>
+                  )}
+                </span>
                 {user.avatar_url ? (
                   <img src={user.avatar_url} alt="User" className="w-10 h-10 rounded-full object-cover"/>
                 ) : (
@@ -93,6 +94,28 @@ export default function Navbar() {
                   <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
                     <p className="font-semibold text-gray-900 dark:text-white">{user.name}</p>
                     <p className="text-sm text-gray-500 dark:text-gray-300">{user.email}</p>
+                    {user.is_premium ? (
+                      <Link
+                        href="/premium"
+                        className="mt-2 inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-bold
+                          bg-linear-to-r from-[#00E2E0] to-[#797CFF] text-white shadow-sm hover:opacity-90"
+                      >
+                        <i className="fa-solid fa-crown"></i>
+                        {user.subscription_label}
+                        {user.subscription_days_left != null && (
+                          <span className="opacity-90">· {user.subscription_days_left}d</span>
+                        )}
+                      </Link>
+                    ) : (
+                      <Link
+                        href="/premium"
+                        className="mt-2 inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-semibold
+                          border border-[#01A9F2] text-[#01A9F2] hover:bg-[#01A9F2] hover:text-white"
+                      >
+                        <i className="fa-solid fa-crown"></i>
+                        Upgrade to Premium
+                      </Link>
+                    )}
                   </div>
 
                   <Link

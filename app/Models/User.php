@@ -21,6 +21,9 @@ class User extends Authenticatable
         'university',
         'major',
         'bio',
+        'subscription_tier',
+        'subscription_started_at',
+        'subscription_expires_at',
     ];
 
     protected $hidden = [
@@ -28,14 +31,50 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    protected $appends = ['avatar_url'];
+    protected $appends = ['avatar_url', 'is_premium', 'subscription_label', 'subscription_days_left'];
 
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
+            'subscription_started_at' => 'datetime',
+            'subscription_expires_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    protected function isPremium(): Attribute
+    {
+        return Attribute::get(function () {
+            $tier = $this->getRawOriginal('subscription_tier') ?? 'free';
+            if ($tier === 'free') return false;
+            $expiresRaw = $this->getRawOriginal('subscription_expires_at');
+            if (!$expiresRaw) return false;
+            return strtotime($expiresRaw) > time();
+        });
+    }
+
+    protected function subscriptionLabel(): Attribute
+    {
+        return Attribute::get(function () {
+            $tier = $this->getRawOriginal('subscription_tier') ?? 'free';
+            return match ($tier) {
+                'monthly' => 'Monthly Plan',
+                'yearly' => 'Yearly Plan',
+                default => 'Free Plan',
+            };
+        });
+    }
+
+    protected function subscriptionDaysLeft(): Attribute
+    {
+        return Attribute::get(function () {
+            $expiresRaw = $this->getRawOriginal('subscription_expires_at');
+            if (!$expiresRaw) return null;
+            $diff = strtotime($expiresRaw) - time();
+            if ($diff <= 0) return 0;
+            return (int) ceil($diff / 86400);
+        });
     }
 
     protected function avatarUrl(): Attribute

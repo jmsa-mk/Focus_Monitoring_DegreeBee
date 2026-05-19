@@ -47,7 +47,6 @@ export default function QuestionBankSection({ files = [], classId, currentUserId
                 </button>
             </div>
 
-            {/* Empty state */}
             {files.length === 0 ? (
                 <div className="text-center py-20 text-gray-500 dark:text-gray-400">
                     <i className="fa-solid fa-folder-open text-7xl mb-4 text-gray-300 dark:text-gray-600"></i>
@@ -68,7 +67,6 @@ export default function QuestionBankSection({ files = [], classId, currentUserId
                 </div>
             )}
 
-            {/* Upload modal */}
             {showUploader && (
                 <UploadModal
                     classId={classId}
@@ -76,7 +74,6 @@ export default function QuestionBankSection({ files = [], classId, currentUserId
                 />
             )}
 
-            {/* Edit modal */}
             {editingFile && (
                 <EditModal
                     file={editingFile}
@@ -84,7 +81,6 @@ export default function QuestionBankSection({ files = [], classId, currentUserId
                 />
             )}
 
-            {/* Preview modal */}
             {previewFile && (
                 <FilePreviewModal
                     url={previewFile.file_url}
@@ -121,7 +117,6 @@ function FileCard({ file, currentUserId, onPreview, onEdit }) {
                 hover:shadow-lg hover:border-[#01A9F2] dark:hover:border-[#01A9F2]
                 transition cursor-pointer overflow-hidden">
 
-                {/* Thumbnail / Icon */}
                 <button
                     type="button"
                     onClick={onPreview}
@@ -139,7 +134,6 @@ function FileCard({ file, currentUserId, onPreview, onEdit }) {
                         <i className={`${fileIconClass(file.file_name)} text-6xl`}></i>
                     )}
 
-                    {/* Hover overlay */}
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition
                         flex items-center justify-center opacity-0 group-hover:opacity-100">
                         <div className="bg-white/95 dark:bg-gray-900/95 px-3 py-1.5 rounded-lg text-xs font-semibold
@@ -150,7 +144,6 @@ function FileCard({ file, currentUserId, onPreview, onEdit }) {
                     </div>
                 </button>
 
-                {/* Info */}
                 <div className="p-3">
                     <div className="font-semibold text-sm text-gray-900 dark:text-white truncate" title={displayName}>
                         {displayName}
@@ -181,7 +174,6 @@ function FileCard({ file, currentUserId, onPreview, onEdit }) {
                     </div>
                 </div>
 
-                {/* Owner actions (hover) */}
                 {isOwner && (
                     <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition">
                         <button

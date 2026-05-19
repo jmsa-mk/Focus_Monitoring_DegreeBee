@@ -9,6 +9,7 @@ use App\Http\Controllers\EnrollmentsController;
 use App\Http\Controllers\ForumPostController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\QuestionBankController;
+use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\FocusLogController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VideoController;
@@ -27,9 +28,7 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::get('/premium', function () {
-    return Inertia::render('Subscription');
-});
+Route::get('/premium', [SubscriptionController::class, 'index'])->name('premium');
 
 
 Route::middleware('auth')->group(function () {
@@ -87,6 +86,9 @@ Route::middleware('auth')->group(function () {
         ->name('classes.unenroll');
 
     Route::post('/focus-session', [FocusLogController::class, 'store']);
+
+    Route::post('/subscription/subscribe', [SubscriptionController::class, 'subscribe'])->name('subscription.subscribe');
+    Route::post('/subscription/cancel', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
 
     Route::post('/videos/{video}/comments', [CommentController::class, 'store'])->name('comments.store');
     Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
