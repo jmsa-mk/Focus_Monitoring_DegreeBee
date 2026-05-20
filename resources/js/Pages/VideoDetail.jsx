@@ -156,7 +156,7 @@ function getYoutubeId(link) {
 export default function VideoDetail() {
     const { video, userRating, userStats, comments, auth } = usePage().props;
 
-    const [focusState, setFocusState] = useState(STATE.FOCUSED);
+    const [focusState, setFocusState] = useState(STATE.PAUSED);
     const [focusTime, setFocusTime] = useState(0);
     const [unfocusTime, setUnfocusTime] = useState(0);
     const [cvDistractTime, setCvDistractTime] = useState(0);
@@ -194,12 +194,13 @@ export default function VideoDetail() {
     const cvDistractTimeRef = useRef(0);
     const lastActivityRef = useRef(Date.now());
     const stateStartRef = useRef(Date.now());
-    const stateRef = useRef(STATE.FOCUSED);
+    const stateRef = useRef(STATE.PAUSED);
     const distractedTriggeredRef = useRef(new Set());
     const idleTriggeredRef = useRef(new Set());
     const sessionSavedRef = useRef(false);
     const playerRef = useRef(null);
-    const isVideoPlayingRef = useRef(true);
+    const isVideoPlayingRef = useRef(false);
+    const hasStartedRef = useRef(false);
 
     useEffect(() => {
         focusTimeRef.current = focusTime;
@@ -255,6 +256,8 @@ export default function VideoDetail() {
 
     useEffect(() => {
         const onVisibility = () => {
+            if (!hasStartedRef.current) return;
+
             if (document.hidden) {
                 setFocusState(STATE.DISTRACTED);
             } else {
@@ -286,6 +289,7 @@ export default function VideoDetail() {
 
                         if (s === YT.PlayerState.PLAYING) {
                             isVideoPlayingRef.current = true;
+                            hasStartedRef.current = true; // unlock counter on first play
                             lastActivityRef.current = Date.now();
                             if (!document.hidden) {
                                 setFocusState(STATE.FOCUSED);
@@ -321,6 +325,8 @@ export default function VideoDetail() {
 
     useEffect(() => {
         const interval = setInterval(() => {
+            if (!hasStartedRef.current) return;
+
             const now = Date.now();
             const current = stateRef.current;
 
@@ -673,7 +679,9 @@ export default function VideoDetail() {
 
                         {focusState === STATE.PAUSED && (
                             <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 italic">
-                                Tracking paused, video tidak diputar
+                                {totalTime === 0
+                                    ? "Klik play di video untuk mulai tracking"
+                                    : "Tracking paused, video tidak diputar"}
                             </p>
                         )}
 
