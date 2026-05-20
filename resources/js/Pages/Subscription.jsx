@@ -19,7 +19,7 @@ function formatDate(iso) {
 
 export default function Subscription() {
     const { component, props } = usePage();
-    const { plans, auth, flash } = props;
+    const { plans, auth, flash, errors } = props;
     const user = auth?.user;
 
     const [confirmPlan, setConfirmPlan] = useState(null);
@@ -29,6 +29,12 @@ export default function Subscription() {
     useEffect(() => {
         if (flash?.success) toast.success(flash.success);
     }, [flash?.success]);
+
+    useEffect(() => {
+        if (errors?.premium) {
+            toast.error(errors.premium, { duration: 5000 });
+        }
+    }, [errors?.premium]);
 
     const currentTier = user?.subscription_tier || "free";
     const isPremium = user?.is_premium === true;

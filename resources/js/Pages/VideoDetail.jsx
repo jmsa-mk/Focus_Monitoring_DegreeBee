@@ -707,15 +707,26 @@ export default function VideoDetail() {
 
                         <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                             <div className="flex items-center justify-between mb-2">
-                                <label className="inline-flex items-center gap-2 text-xs font-semibold text-gray-700 dark:text-gray-200 cursor-pointer">
+                                <label
+                                    className={`inline-flex items-center gap-2 text-xs font-semibold
+                                        ${auth?.user?.is_premium ? "text-gray-700 dark:text-gray-200 cursor-pointer" : "text-gray-400 dark:text-gray-500 cursor-not-allowed"}`}
+                                    title={auth?.user?.is_premium ? "" : "Premium feature"}
+                                >
                                     <input
                                         type="checkbox"
                                         checked={cvEnabled}
-                                        onChange={(e) => setCvEnabled(e.target.checked)}
+                                        onChange={(e) => {
+                                            if (!auth?.user?.is_premium) return;
+                                            setCvEnabled(e.target.checked);
+                                        }}
+                                        disabled={!auth?.user?.is_premium}
                                         className="w-4 h-4 accent-[#01A9F2]"
                                     />
                                     <i className="fa-solid fa-eye"></i>
                                     Eye Tracking
+                                    {!auth?.user?.is_premium && (
+                                        <i className="fa-solid fa-crown text-yellow-500 ml-1" title="Premium feature"></i>
+                                    )}
                                 </label>
                                 {cvEnabled && faceTracker.ready && (
                                     <button
@@ -728,6 +739,20 @@ export default function VideoDetail() {
                                     </button>
                                 )}
                             </div>
+
+                            {!auth?.user?.is_premium && (
+                                <a
+                                    href="/premium"
+                                    className="block mt-2 px-3 py-2 rounded-lg text-xs text-center font-semibold
+                                        bg-linear-to-r from-[#00E2E0]/20 to-[#797CFF]/20
+                                        dark:from-[#213A58]/40 dark:to-[#172D9D]/40
+                                        text-[#01A9F2] dark:text-[#797CFF]
+                                        border border-[#01A9F2]/30 hover:opacity-80"
+                                >
+                                    <i className="fa-solid fa-crown mr-1"></i>
+                                    Upgrade to Premium untuk Eye Tracking + Virtual Background
+                                </a>
+                            )}
 
                             {cvEnabled && (
                                 <div className="space-y-2">

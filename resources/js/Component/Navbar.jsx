@@ -53,7 +53,16 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-10 text-gray-700 dark:text-gray-200 font-medium">
           <Link href="/" className="hover:text-black dark:hover:text-white">Home</Link>
           <Link href={user ? "/explore" : "/register"} className="hover:text-black dark:hover:text-white">Explore Videos</Link>
-          <Link href={user ? "/classes" : "/register"} className="hover:text-black dark:hover:text-white">My Classes</Link>
+          <Link
+            href={!user ? "/register" : user.is_premium ? "/classes" : "/premium"}
+            className="hover:text-black dark:hover:text-white inline-flex items-center gap-1.5"
+            title={user && !user.is_premium ? "Premium feature" : ""}
+          >
+            My Classes
+            {user && !user.is_premium && (
+              <i className="fa-solid fa-crown text-yellow-500 text-[10px]"></i>
+            )}
+          </Link>
           <Link href="/premium" className="hover:text-black dark:hover:text-white">Premium</Link>
         </div>
 
@@ -144,6 +153,13 @@ export default function Navbar() {
                     className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
                     Saved Videos
+                  </Link>
+
+                  <Link
+                    href="/subscription/transactions"
+                    className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    Riwayat Transaksi
                   </Link>
 
                   <button

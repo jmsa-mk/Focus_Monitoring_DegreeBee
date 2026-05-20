@@ -73,22 +73,25 @@ Route::middleware('auth')->group(function () {
     Route::get('/bookmark', [BookmarkController::class, 'index']);
     Route::post('/bookmark/{video}', [BookmarkController::class, 'toggle']);
 
-    Route::get('/classes', [ClassesController::class, 'index'])->name('classes.index');
-    Route::get('/classes/create', [ClassesController::class, 'create'])->name('classes.create');
-    Route::get('/join', [ClassesController::class, 'showJoin']);
-    Route::post('/classes/store', [ClassesController::class, 'storeClass']);
-    Route::post('/classes/join', [ClassesController::class, 'join']);
-    Route::get('/classes/{class}', [ClassesController::class, 'show'])->name('classes.show');
-    Route::get('/classes/{class}/edit', [ClassesController::class, 'edit'])->name('classes.edit');
-    Route::post('/classes/{class}/edit', [ClassesController::class, 'update'])->name('classes.update');
-    Route::delete('/classes/{class}', [ClassesController::class, 'destroy']);
-    Route::delete('/classes/{class}/unenroll', [EnrollmentsController::class, 'unenroll'])
-        ->name('classes.unenroll');
+    Route::middleware('premium')->group(function () {
+        Route::get('/classes', [ClassesController::class, 'index'])->name('classes.index');
+        Route::get('/classes/create', [ClassesController::class, 'create'])->name('classes.create');
+        Route::get('/join', [ClassesController::class, 'showJoin']);
+        Route::post('/classes/store', [ClassesController::class, 'storeClass']);
+        Route::post('/classes/join', [ClassesController::class, 'join']);
+        Route::get('/classes/{class}', [ClassesController::class, 'show'])->name('classes.show');
+        Route::get('/classes/{class}/edit', [ClassesController::class, 'edit'])->name('classes.edit');
+        Route::post('/classes/{class}/edit', [ClassesController::class, 'update'])->name('classes.update');
+        Route::delete('/classes/{class}', [ClassesController::class, 'destroy']);
+        Route::delete('/classes/{class}/unenroll', [EnrollmentsController::class, 'unenroll'])
+            ->name('classes.unenroll');
+    });
 
     Route::post('/focus-session', [FocusLogController::class, 'store']);
 
     Route::post('/subscription/subscribe', [SubscriptionController::class, 'subscribe'])->name('subscription.subscribe');
     Route::post('/subscription/cancel', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
+    Route::get('/subscription/transactions', [SubscriptionController::class, 'transactions'])->name('subscription.transactions');
 
     Route::post('/videos/{video}/comments', [CommentController::class, 'store'])->name('comments.store');
     Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
@@ -96,7 +99,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/comments/{comment}/like', [CommentController::class, 'toggleLike'])->name('comments.like');
 });
 
-Route::prefix('classes/{classId}')->middleware('auth')->group(function () {
+Route::prefix('classes/{classId}')->middleware(['auth', 'premium'])->group(function () {
     Route::get('/resources', [ClassVideoController::class, 'index']);
     Route::post('/videos', [ClassVideoController::class, 'store']);
     Route::put('/videos/{id}', [ClassVideoController::class, 'update']);
@@ -107,7 +110,7 @@ Route::prefix('classes/{classId}')->middleware('auth')->group(function () {
     Route::post('/question-bank', [QuestionBankController::class, 'store'])->name('questionBank.store');
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'premium'])->group(function () {
     Route::put('/forum/{post}', [ForumPostController::class, 'update'])->name('forum.update');
     Route::delete('/forum/{post}', [ForumPostController::class, 'destroy'])->name('forum.destroy');
     Route::post('/forum/{post}/insight', [ForumPostController::class, 'toggleInsight'])->name('forum.insight');
