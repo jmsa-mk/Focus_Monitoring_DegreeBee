@@ -71,7 +71,10 @@ export default function Bookmark() {
                                 return (
                                     <div
                                         key={video.id}
-                                        className="bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden border border-gray-200 dark:border-gray-700 hover:shadow-xl transition"
+                                        className="group bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden
+                                            border border-gray-200 dark:border-gray-700
+                                            hover:shadow-2xl hover:border-[#01A9F2] dark:hover:border-[#797CFF]
+                                            hover:-translate-y-1 transition-all duration-300"
                                     >
                                         <div className="w-full aspect-video bg-black">
                                             {id ? (

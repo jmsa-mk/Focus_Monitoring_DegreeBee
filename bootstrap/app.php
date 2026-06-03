@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureAdmin;
 use App\Http\Middleware\EnsurePremium;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
@@ -19,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->alias([
             'premium' => EnsurePremium::class,
+            'admin' => EnsureAdmin::class,
         ]);
         $middleware->validateCsrfTokens(except: [
             'focus-session',

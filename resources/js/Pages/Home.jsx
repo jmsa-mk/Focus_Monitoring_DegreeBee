@@ -38,62 +38,75 @@ export default function Home(){
                 <section className="w-full flex justify-center px-6 pb-15 pt-15">
 
                     <div className="
-                        w-full max-w-7xl bg-white/70 backdrop-blur-md rounded-3xl shadow-xl
-                        p-20 flex flex-col md:flex-row items-center gap-10
-                        dark:bg-gray-900/70
+                        relative w-full max-w-7xl bg-white/70 backdrop-blur-md rounded-3xl shadow-xl
+                        p-12 md:p-20 flex flex-col md:flex-row items-center gap-10
+                        dark:bg-gray-900/70 overflow-hidden
                     ">
+                        {/* Decorative gradient blobs */}
+                        <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-[#00E2E0]/20 dark:bg-[#172D9D]/30 blur-3xl pointer-events-none"></div>
+                        <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-[#797CFF]/20 dark:bg-[#213A58]/30 blur-3xl pointer-events-none"></div>
 
-                        <div className="flex-1">
+                        <div className="flex-1 relative z-10">
 
-                            <h1 className="text-4xl md:text-3xl font-bold text-gray-900 leading-tight dark:text-white">
+                            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold
+                                bg-[#BAFFFE] text-[#0C2D34] dark:bg-[#172D9D]/40 dark:text-[#BAFFFE] mb-4">
+                                <i className="fa-solid fa-sparkles"></i>
+                                Focus better with AI
+                            </span>
+
+                            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight dark:text-white">
                                 Empowering the Way Students <br/>
-                                Stay Focused and Learn Better
+                                <span className="bg-linear-to-r from-[#01A9F2] to-[#797CFF] bg-clip-text text-transparent">
+                                    Stay Focused and Learn Better
+                                </span>
                             </h1>
 
-                            <p className="mt-4 text-gray-700 text-lg max-w-xl dark:text-white">
+                            <p className="mt-4 text-gray-700 text-lg max-w-xl dark:text-gray-200">
                                 Monitor your study focus, save important materials, and find
                                 the best videos from the student community.
                             </p>
 
                             {!user && (
-                                <>
-                                    <Link
-                                href="/register"
-                                className="
-                                    w-62.5 mt-6 px-8 py-3 bg-[#01A9F2] hover:bg-blue-500 text-white
-                                    font-semibold rounded-full shadow-md transition inline-block text-center
-                                    dark:bg-[#213A58] dark:hover:bg-gray-800
-                                "
+                                <Link
+                                    href="/register"
+                                    className="mt-6 px-8 py-3
+                                        bg-linear-to-r from-[#01A9F2] to-[#797CFF]
+                                        dark:from-[#213A58] dark:to-[#172D9D]
+                                        text-white font-semibold rounded-full shadow-md
+                                        hover:shadow-2xl hover:opacity-90
+                                        transition-all duration-200 inline-flex items-center gap-2"
                                 >
-                                Sign Up
-                            </Link>
-                                </>
+                                    Sign Up
+                                    <i className="fa-solid fa-arrow-right"></i>
+                                </Link>
                             )}
                             {user && (
-                                <>
-                                    <Link
-                                href="/explore"
-                                className="
-                                    w-62.5 mt-6 px-8 py-3 bg-[#01A9F2] hover:bg-blue-500 text-white
-                                    font-semibold rounded-full shadow-md transition inline-block text-center
-                                    dark:bg-[#213A58] dark:hover:bg-gray-800
-                                "
+                                <Link
+                                    href="/explore"
+                                    className="mt-6 px-8 py-3
+                                        bg-linear-to-r from-[#01A9F2] to-[#797CFF]
+                                        dark:from-[#213A58] dark:to-[#172D9D]
+                                        text-white font-semibold rounded-full shadow-md
+                                        hover:shadow-2xl hover:opacity-90
+                                        transition-all duration-200 inline-flex items-center gap-2"
                                 >
-                                Explore
-                            </Link>
-                                </>
+                                    Explore Videos
+                                    <i className="fa-solid fa-arrow-right"></i>
+                                </Link>
                             )}
 
                         </div>
 
-                        <div className="flex-1 flex justify-center">
-                            <img src={Logo} alt="Logo" className="w-64 md:w-80 object-contain"/>
+                        <div className="flex-1 flex justify-center relative z-10">
+                            <div className="relative">
+                                <div className="absolute inset-0 bg-linear-to-br from-[#00E2E0]/30 to-[#797CFF]/30 blur-3xl"></div>
+                                <img src={Logo} alt="Logo" className="relative w-64 md:w-80 object-contain drop-shadow-2xl"/>
+                            </div>
                         </div>
 
                     </div>
                 </section>
 
-                {/* Feature section */}
                 <section className="w-full flex justify-center px-6 pb-15">
 
                 <div
@@ -155,7 +168,6 @@ export default function Home(){
 
                         </div>
 
-                        {/* CARD 3 */}
                         <div className="
                             bg-white text-gray-900
                             rounded-2xl p-6

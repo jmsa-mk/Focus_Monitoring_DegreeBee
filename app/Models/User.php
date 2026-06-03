@@ -31,7 +31,7 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    protected $appends = ['avatar_url', 'is_premium', 'subscription_label', 'subscription_days_left'];
+    protected $appends = ['avatar_url', 'is_premium', 'is_admin', 'subscription_label', 'subscription_days_left'];
 
     protected function casts(): array
     {
@@ -46,11 +46,22 @@ class User extends Authenticatable
     protected function isPremium(): Attribute
     {
         return Attribute::get(function () {
+            // Admins have full access to every premium feature.
+            if (($this->getRawOriginal('role') ?? 'student') === 'admin') {
+                return true;
+            }
             $tier = $this->getRawOriginal('subscription_tier') ?? 'free';
             if ($tier === 'free') return false;
             $expiresRaw = $this->getRawOriginal('subscription_expires_at');
             if (!$expiresRaw) return false;
             return strtotime($expiresRaw) > time();
+        });
+    }
+
+    protected function isAdmin(): Attribute
+    {
+        return Attribute::get(function () {
+            return ($this->getRawOriginal('role') ?? 'student') === 'admin';
         });
     }
 

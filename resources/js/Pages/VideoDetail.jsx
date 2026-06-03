@@ -2,6 +2,7 @@ import { Head, usePage, router } from "@inertiajs/react";
 import Navbar from "../Component/Navbar";
 import StarRating from "../Component/StarRating";
 import CommentSection from "../Component/CommentSection";
+import ReportModal from "../Component/ReportModal";
 import { useFaceTracker } from "../Component/useFaceTracker";
 import { useVirtualBackground } from "../Component/useVirtualBackground";
 import { useEffect, useRef, useState, useCallback } from "react";
@@ -156,6 +157,7 @@ function getYoutubeId(link) {
 export default function VideoDetail() {
     const { video, userRating, userStats, comments, auth } = usePage().props;
 
+
     const [focusState, setFocusState] = useState(STATE.PAUSED);
     const [focusTime, setFocusTime] = useState(0);
     const [unfocusTime, setUnfocusTime] = useState(0);
@@ -163,6 +165,7 @@ export default function VideoDetail() {
     const [showOverlay, setShowOverlay] = useState(false);
     const [rating, setRating] = useState(userRating || 0);
     const [hoverRating, setHoverRating] = useState(0);
+    const [showReportModal, setShowReportModal] = useState(false);
     const [showSummary, setShowSummary] = useState(false);
     const [summaryData, setSummaryData] = useState(null);
     const [savingSession, setSavingSession] = useState(false);
@@ -648,8 +651,8 @@ export default function VideoDetail() {
 
             <div
                 className="w-full min-h-screen bg-cover bg-top bg-no-repeat bg-fixed
-                bg-[url('/resources/js/assets/Background/Background2.png')]
-                dark:bg-[url('/resources/js/assets/Background/Background_Dark2.png')]"
+                bg-[url('/resources/js/assets/Background/Background.jpg')]
+                dark:bg-[url('/resources/js/assets/Background/Background_Dark.jpg')]"
             >
                 <Navbar />
                 <Toaster position="top-right" />
@@ -1027,6 +1030,15 @@ export default function VideoDetail() {
                                     }
                                 ></i>
                             </button>
+
+                            <button
+                                type="button"
+                                onClick={() => setShowReportModal(true)}
+                                className="w-10 h-10 flex items-center justify-center text-xl hover:scale-125 transition-transform cursor-pointer"
+                                title="Laporkan video ini ke admin"
+                            >
+                                <i className="fa-regular fa-flag text-gray-400 dark:text-gray-500 hover:text-red-500"></i>
+                            </button>
                         </div>
                     </div>
 
@@ -1036,6 +1048,15 @@ export default function VideoDetail() {
                         currentUserId={auth?.user?.id}
                     />
                 </div>
+
+                {showReportModal && (
+                    <ReportModal
+                        type="video"
+                        id={video.id}
+                        title={video.title}
+                        onClose={() => setShowReportModal(false)}
+                    />
+                )}
 
                 {showOverlay && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">

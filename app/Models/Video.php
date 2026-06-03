@@ -47,4 +47,9 @@ class Video extends Model
     {
         return $this->hasMany(FocusLog::class);
     }
+
+    public function reports()
+    {
+        return $this->morphMany(Report::class, 'reportable');
+    }
 }

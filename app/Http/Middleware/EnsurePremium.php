@@ -17,6 +17,10 @@ class EnsurePremium
             return redirect()->route('login');
         }
 
+        if (($user->getRawOriginal('role') ?? 'student') === 'admin') {
+            return $next($request);
+        }
+
         $tier = $user->getRawOriginal('subscription_tier') ?? 'free';
         $expiry = $user->getRawOriginal('subscription_expires_at');
         $isPremium = $tier !== 'free' && $expiry && strtotime($expiry) > time();

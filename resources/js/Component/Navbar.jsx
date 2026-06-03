@@ -127,6 +127,16 @@ export default function Navbar() {
                     )}
                   </div>
 
+                  {user.is_admin && (
+                    <Link
+                      href="/admin"
+                      className="flex items-center gap-2 px-4 py-2 font-semibold text-[#01A9F2] hover:bg-[#01A9F2]/10"
+                    >
+                      <i className="fa-solid fa-shield-halved"></i>
+                      Admin Panel
+                    </Link>
+                  )}
+
                   <Link
                     href="/profile"
                     className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"

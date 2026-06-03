@@ -47,6 +47,15 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
             ],
+            'admin' => function () use ($request) {
+                $user = $request->user();
+                if ($user && ($user->getRawOriginal('role') ?? 'student') === 'admin') {
+                    return [
+                        'pending_reports' => \App\Models\Report::where('status', 'pending')->count(),
+                    ];
+                }
+                return null;
+            },
         ]);
     }
 }

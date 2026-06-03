@@ -2,8 +2,6 @@ import { Head, usePage, router } from "@inertiajs/react";
 import Navbar from "../Component/Navbar";
 import StarRating from "../Component/StarRating";
 
-import Container from '@/assets/Background/Container.png';
-
 import { useState, useEffect, useRef } from "react";
 
 export default function ExploreVideos(){
@@ -101,8 +99,8 @@ export default function ExploreVideos(){
 
             <div
                 className="w-full min-h-screen bg-cover bg-top bg-no-repeat bg-fixed
-                bg-[url('/resources/js/assets/Background/Background2.png')]
-                dark:bg-[url('/resources/js/assets/Background/Background_Dark2.png')]
+                bg-[url('/resources/js/assets/Background/Background.jpg')]
+                dark:bg-[url('/resources/js/assets/Background/Background_Dark.jpg')]
                 "
             >
                 <Navbar/>
@@ -115,35 +113,56 @@ export default function ExploreVideos(){
                     >
 
 
-                        <div
-                            className="relative w-full rounded-3xl px-10 py-14 overflow-hidden bg-cover bg-center
-                                dark:bg-linear-to-r dark:from-[#213A58] dark:to-[#172D9D]"
-                            style={{ backgroundImage: `url(${Container})` }}
-                        >
+                        <div className="relative w-full rounded-3xl px-10 py-16 overflow-hidden shadow-xl
+                            bg-linear-to-br from-[#01A9F2] via-[#00E2E0] to-[#797CFF]
+                            dark:from-[#213A58] dark:via-[#172D9D] dark:to-[#0F172A]">
+
+                            {/* Decorative blobs */}
+                            <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-white/10 blur-3xl pointer-events-none"></div>
+                            <div className="absolute -bottom-24 -left-16 w-72 h-72 rounded-full bg-[#BAFFFE]/20 blur-3xl pointer-events-none"></div>
+                            <div className="absolute top-1/2 right-1/3 w-32 h-32 rounded-full bg-[#797CFF]/30 blur-2xl pointer-events-none"></div>
+
                             <a
                                 href="/uploadVideo"
-                                className="text-white/90 underline text-sm absolute top-6 left-8 hover:opacity-70"
+                                className="absolute top-6 left-8 inline-flex items-center gap-2 px-4 py-2 rounded-full
+                                    bg-white/15 backdrop-blur-md border border-white/30
+                                    text-white text-sm font-semibold hover:bg-white/25 transition shadow-lg z-10"
                             >
+                                <i className="fa-solid fa-cloud-arrow-up"></i>
                                 Upload Video
                             </a>
 
-                            <h1 className="text-white text-4xl md:text-5xl font-semibold text-center">
-                                Hi {user?.name} !
-                            </h1>
+                            <div className="relative z-10">
+                                <h1 className="text-white text-4xl md:text-5xl font-bold text-center drop-shadow-lg">
+                                    Hi {user?.name}!
+                                </h1>
+                                <p className="text-white/85 text-center mt-2 text-sm md:text-base">
+                                    Let's find something great to learn today
+                                </p>
 
-                            <form onSubmit={submitSearch} className="flex justify-center mt-10">
-                                <div className="flex items-center bg-white dark:bg-gray-800 rounded-full px-6 py-4 w-full max-w-3xl shadow-lg">
-                                    <i className="fa-solid fa-magnifying-glass text-gray-500 dark:text-gray-400"></i>
-                                    <input
-                                        type="text"
-                                        placeholder="What do you want to learn?"
-                                        value={search}
-                                        onChange={(e) => setSearch(e.target.value)}
-                                        className="w-full outline-none text-gray-700 placeholder-gray-400 bg-transparent ml-3
-                                            dark:text-white dark:placeholder-gray-400"
-                                    />
-                                </div>
-                            </form>
+                                <form onSubmit={submitSearch} className="flex justify-center mt-8">
+                                    <div className="flex items-center bg-white dark:bg-gray-800 rounded-full px-6 py-4 w-full max-w-3xl shadow-2xl
+                                        ring-4 ring-white/20 focus-within:ring-white/40 transition">
+                                        <i className="fa-solid fa-magnifying-glass text-gray-500 dark:text-gray-400"></i>
+                                        <input
+                                            type="text"
+                                            placeholder="What do you want to learn?"
+                                            value={search}
+                                            onChange={(e) => setSearch(e.target.value)}
+                                            className="w-full outline-none text-gray-700 placeholder-gray-400 bg-transparent ml-3
+                                                dark:text-white dark:placeholder-gray-400"
+                                        />
+                                        <button
+                                            type="submit"
+                                            className="ml-3 px-4 py-2 rounded-full bg-linear-to-r from-[#01A9F2] to-[#797CFF]
+                                                dark:from-[#213A58] dark:to-[#172D9D]
+                                                text-white text-sm font-semibold hover:opacity-90 transition shadow-md"
+                                        >
+                                            Search
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
 
                         <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -154,9 +173,12 @@ export default function ExploreVideos(){
                                 return (
                                     <div
                                         key={video.id}
-                                        className="bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden border border-gray-200 dark:border-gray-700 hover:shadow-xl transition"
+                                        className="group bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden
+                                            border border-gray-200 dark:border-gray-700
+                                            hover:shadow-2xl hover:border-[#01A9F2] dark:hover:border-[#797CFF]
+                                            hover:-translate-y-1 transition-all duration-300"
                                     >
-                                        <div className="w-full aspect-video bg-black">
+                                        <div className="w-full aspect-video bg-black overflow-hidden">
                                             {playVideo === video.id ? (
                                                 <iframe
                                                     className="w-full h-full"
@@ -167,7 +189,8 @@ export default function ExploreVideos(){
                                             ) : (
                                                 <img
                                                     src={`https://img.youtube.com/vi/${id}/hqdefault.jpg`}
-                                                    className="w-full h-full object-cover cursor-pointer hover:opacity-80"
+                                                    className="w-full h-full object-cover cursor-pointer
+                                                        group-hover:scale-110 transition-transform duration-500"
                                                     onClick={() => router.get(`/videos/${video.id}`)}
                                                 />
                                             )}

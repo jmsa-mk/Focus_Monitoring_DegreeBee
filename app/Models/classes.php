@@ -68,4 +68,9 @@ class classes extends Model
             'user_id'
         );
     }
+
+    public function reports()
+    {
+        return $this->morphMany(Report::class, 'reportable');
+    }
 }

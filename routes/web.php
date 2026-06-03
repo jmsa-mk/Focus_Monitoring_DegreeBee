@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\ClassesController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\EnrollmentsController;
 use App\Http\Controllers\ForumPostController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\QuestionBankController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\FocusLogController;
 use App\Http\Controllers\ProfileController;
@@ -93,6 +95,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/subscription/cancel', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
     Route::get('/subscription/transactions', [SubscriptionController::class, 'transactions'])->name('subscription.transactions');
 
+    Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
+
     Route::post('/videos/{video}/comments', [CommentController::class, 'store'])->name('comments.store');
     Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
@@ -108,6 +112,29 @@ Route::prefix('classes/{classId}')->middleware(['auth', 'premium'])->group(funct
     Route::post('/forum', [ForumPostController::class, 'store'])->name('forum.store');
     Route::post('/notes', [NoteController::class, 'store'])->name('notes.store');
     Route::post('/question-bank', [QuestionBankController::class, 'store'])->name('questionBank.store');
+});
+
+
+Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(function () {
+    Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
+
+    Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::post('/users/{user}/premium', [AdminController::class, 'togglePremium'])->name('users.premium');
+    Route::post('/users/{user}/role', [AdminController::class, 'toggleRole'])->name('users.role');
+    Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('users.destroy');
+
+    Route::get('/videos', [AdminController::class, 'videos'])->name('videos');
+    Route::delete('/videos/{video}', [AdminController::class, 'destroyVideo'])->name('videos.destroy');
+
+    Route::get('/classes', [AdminController::class, 'classes'])->name('classes');
+    Route::delete('/classes/{class}', [AdminController::class, 'destroyClass'])->name('classes.destroy');
+
+    Route::get('/transactions', [AdminController::class, 'transactions'])->name('transactions');
+
+    Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
+    Route::patch('/reports/{report}', [AdminController::class, 'updateReport'])->name('reports.update');
+    Route::delete('/reports/{report}', [AdminController::class, 'destroyReport'])->name('reports.destroy');
+    Route::delete('/reports/{report}/content', [AdminController::class, 'destroyReportedContent'])->name('reports.content.destroy');
 });
 
 Route::middleware(['auth', 'premium'])->group(function () {

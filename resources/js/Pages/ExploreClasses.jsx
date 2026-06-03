@@ -14,8 +14,8 @@ export default function MyClasses(){
 
             <div
                 className="w-full min-h-screen bg-cover bg-top bg-no-repeat bg-fixed
-                bg-[url('/resources/js/assets/Background/Background2.png')]
-                dark:bg-[url('/resources/js/assets/Background/Background_Dark2.png')]
+                bg-[url('/resources/js/assets/Background/Background.jpg')]
+                dark:bg-[url('/resources/js/assets/Background/Background_Dark.jpg')]
                 "
             >
                 <Navbar />
@@ -67,18 +67,23 @@ export default function MyClasses(){
                                         <div
                                             key={cls.id}
                                             onClick={() => router.get(`/classes/${cls.id}`)}
-                                            className="bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-xl transition cursor-pointer overflow-hidden"
+                                            className="group bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden
+                                                border border-gray-200 dark:border-gray-700
+                                                hover:shadow-2xl hover:border-[#01A9F2] dark:hover:border-[#797CFF]
+                                                hover:-translate-y-1 transition-all duration-300 cursor-pointer"
                                         >
-                                            <div className="h-40 bg-gray-200 dark:bg-gray-700">
+                                            <div className="h-40 bg-gray-200 dark:bg-gray-700 overflow-hidden">
                                                 {cls.thumbnail_url ? (
                                                     <img
                                                         src={cls.thumbnail_url}
                                                         alt={cls.title}
-                                                        className="w-full h-full object-cover"
+                                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                                     />
                                                 ) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
-                                                        No Thumbnail
+                                                    <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 gap-2
+                                                        bg-linear-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700">
+                                                        <i className="fa-solid fa-image text-4xl opacity-50"></i>
+                                                        <span className="text-xs">No Thumbnail</span>
                                                     </div>
                                                 )}
                                             </div>

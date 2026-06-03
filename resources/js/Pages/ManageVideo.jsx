@@ -95,7 +95,9 @@ export default function ManageVideo() {
                                 return (
                                     <div
                                         key={video.id}
-                                        className="bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition
+                                        className="group bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden
+                                            hover:shadow-2xl hover:-translate-y-1 hover:border-[#01A9F2] dark:hover:border-[#797CFF]
+                                            transition-all duration-300
                                             border border-gray-200 dark:border-gray-700"
                                     >
                                         {thumbnail && (
@@ -165,7 +167,7 @@ export default function ManageVideo() {
 
                 <Footer />
 
-                {/* DELETE MODAL */}
+
                 {deleteId && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
                         <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-8 w-[90%] max-w-md text-center
