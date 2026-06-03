@@ -145,7 +145,7 @@ The computer vision pipeline is fully client side. The webcam stream is processe
 
 ```bash
 # 1. Clone the repository
-git clone <your-repo-url> degreebee
+git clone https://github.com/jmsa-mk/Focus_Monitoring_DegreeBee.git
 cd degreebee
 
 # 2. Install PHP dependencies
